@@ -38,8 +38,10 @@
 }
 
 .orange-half {
-  width: 280px;
-  height: 140px;
+  /* width: 280px;
+  height: 140px; */
+  width: 180px;
+  height: 90px;
   background: #ff8844;
   border-radius: 180px 180px 0 0;
   bottom: 50px;
@@ -148,7 +150,9 @@
   color: #cc5522;
   letter-spacing: 8px;
 } */
-
+.head {
+  z-index: 9999;
+}
 .purple-rect {
   width: 80px;
   height: 170px;
@@ -157,6 +161,44 @@
   left: 90px;
   border-radius: 1px;
   z-index: 2;
+}
+
+.purple-rect .eyes {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  top: 10px;
+}
+.purple-rect .eyes .eye {
+  width: 10px;
+  height: 10px;
+  background-color: black;
+  border-radius: 50%;
+  position: relative;
+  /* transition: transform 0.3s ease-in-out; */
+  animation: blinking 3s infinite ease-in-out;
+  animation-delay: calc(1s * var(--blink-delay, 0));
+  transform: var(--eye-transform, translate(0, 0)) scaleY(var(--eye-scale, 1));
+  transform-origin: center center;
+}
+
+.purple-rect .mouth {
+  position: absolute;
+  background-color: #000;
+  width: 30px;
+  height: 12px;
+  top: 60px;
+  border-radius: 0 0 12.5px 12.5px;
+  transition: 0.5s;
+}
+
+.purple-rect.active:hover .mouth {
+  width: 20px;
+  height: 15px;
+  transform: translateX(20px);
+  border-radius: 100%;
 }
 
 .black-rect {
@@ -215,6 +257,34 @@ h1 {
   font-weight: 600;
   margin: 20px 0 40px 0;
   text-align: center;
+  padding-bottom: 20px;
+}
+
+.title_animation_1 {
+  animation: title_fadein_1 0.6s ease-in-out;
+}
+.title_animation_2 {
+  animation: title_fadein_2 0.6s ease-in-out;
+}
+@keyframes title_fadein_1 {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes title_fadein_2 {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .form-group {
@@ -313,6 +383,10 @@ input.error {
 .forgot-password {
   color: #6633ff;
   text-decoration: none;
+  transition: text-decoration 0.2s;
+}
+.forgot-password:hover {
+  text-decoration: underline;
 }
 
 .login-btn {
@@ -333,36 +407,6 @@ input.error {
   background: #49bbbd;
 }
 
-.google-login {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  background: white;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.3s;
-  margin-bottom: 30px;
-}
-
-.google-login:hover {
-  background: #f9f9f9;
-}
-
-.signup-link {
-  text-align: center;
-  font-size: 14px;
-  color: #666;
-}
-
-.signup-link a {
-  color: #49bbbd;
-  text-decoration: none;
-  font-weight: 500;
-}
 /* ******************* */
 
 #toggle-container {
@@ -379,15 +423,18 @@ input.error {
 #active-pill {
   position: absolute;
   top: 8px;
-  bottom: 8px;
+  bottom: 7px;
   left: 8px;
   background-color: var(--color-dark-teal);
+  width: calc(50% - 12px);
   border-radius: 9999px;
   transition: all 0.4s ease-in-out;
   z-index: 10;
-
   box-shadow: inset 3px 3px 5px rgba(0, 0, 0, 0.2),
     inset -3px -3px 5px rgba(255, 255, 255, 0.5);
+}
+.rounded-pill.move-right {
+  left: calc(50% + 1px) !important;
 }
 
 .toggle-button {
@@ -411,4 +458,35 @@ input.error {
 
 .inactive-text {
   color: var(--color-dark-teal);
+}
+
+/* Start Handle Forms */
+.forms_container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+.forms_box {
+  display: flex;
+  align-items: center;
+  width: 200%;
+  transition: transform 0.6s ease-in-out;
+}
+.forms_box .form_box {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 0 20px;
+}
+.forms_box .form_box.login {
+  transform: translateX(100%);
+}
+.forms_box .form_box.register {
+  transform: translateX(-100%);
+}
+.forms_box.slide_right {
+  transform: translateX(-50%);
+}
+.forms_box.slide_left {
+  transform: translateX(0%);
 }

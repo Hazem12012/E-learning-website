@@ -1,8 +1,8 @@
-import Login from "./pages/login/Login.jsx";
+import Login_Register from "./pages/login/Login_Register.jsx";
 function App() {
   return (
     <>
-      <Login />
+      <Login_Register />
     </>
   );
 }
