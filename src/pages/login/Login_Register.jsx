@@ -1,5 +1,6 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import "./Login.css";
+import Eyes from "./Eyes";
 
 function reducer(state, action) {
   switch (action.type) {
@@ -40,36 +41,6 @@ function Login_Register() {
   const [showConrirmPassword, setShowConfirmPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const orangeRef = useRef(null);
-  useEffect(() => {
-    const orangeHalf = orangeRef.current;
-    if (!orangeHalf) return;
-
-    const eyes = orangeHalf.querySelectorAll(".eye");
-
-    function handleMouseMove(e) {
-      const rect = orangeHalf.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-
-      const deltaX = e.clientX - centerX;
-      const deltaY = e.clientY - centerY;
-      const maxMove = 8;
-
-      const moveX = Math.max(Math.min(deltaX / 30, maxMove), -maxMove);
-      const moveY = Math.max(Math.min(deltaY / 30, maxMove), -maxMove);
-
-      eyes.forEach((eye) => {
-        eye.style.setProperty(
-          "--eye-transform",
-          `translate(${moveX}px, ${moveY}px)`
-        );
-      });
-    }
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
 
   // ****************************************************
 
@@ -104,29 +75,57 @@ function Login_Register() {
       {/* Left Section */}
       <div className='left-section'>
         <div className='characters-container' id='characters'>
-          <div className={`character orange-half ${"fjlsdkf"}`} ref={orangeRef}>
+          {/* Satrt orange */}
+          <div className={`character orange-half ${"fjlsdkf"}  `}>
             <div className='head d-flex align-items-center justify-content-center'>
-              <div className='eyes'>
-                <div className='eye eye_1'></div>
-                <div className='eye eye_2'></div>
-              </div>
+              <Eyes color={"black"} width={"10px"} height={"10px"} />
               <div className='mouth'></div>
             </div>
           </div>
+          {/* end orange */}
+          {/* Start blue */}
           <div className='character purple-rect'>
-            <div className='head d-flex align-items-center justify-content-center'>
-              <div className='eyes'>
-                <div className='eye eye_1'></div>
-                <div className='eye eye_2'></div>
+            <div className=' d-flex align-items-center justify-content-center'>
+              <div className='blue_head'>
+                <Eyes
+                  color={"white"}
+                  width={"10px"}
+                  height={"9px"}
+                  delay={"2s"}
+                />
+                <div className='mouth_blue'></div>
               </div>
-              <div className='mouth'></div>
             </div>
           </div>
-          <div className='character black-rect'></div>
-          <div className='character yellow-pill'></div>
+          {/* End blue */}
+          {/* Start black */}
+          <div className='character black-rect'>
+            <div className='head d-flex align-items-center justify-content-center'>
+              <Eyes
+                color={"white"}
+                width={"9px"}
+                height={"9px"}
+                delay={".6s"}
+              />
+            </div>
+          </div>
+          {/* End Black */}
+          {/* Start yellow */}
+          <div className='character yellow-pill'>
+            <div className='head d-flex align-items-center justify-content-center'>
+              <Eyes
+                color={"black"}
+                width={"10px"}
+                height={"10px"}
+                delay={"2.3s"}
+              />
+              <div className="mouth_yellow"></div>
+            </div>
+          </div>
+          {/* End yellow */}
         </div>
       </div>
-
+      {/*  */}
       {/* Right Section */}
       <div className='right-section'>
         <div className='login-container'>
@@ -159,7 +158,10 @@ function Login_Register() {
             </button>
           </div>
 
-          <h1 className={`${isLogin ? "title_animation_1" : "title_animation_2"}`}>
+          <h1
+            className={`${
+              isLogin ? "title_animation_1" : "title_animation_2"
+            }`}>
             {isLogin ? "Welcome back" : "Welcome"}
           </h1>
           <div className='forms_container'>

@@ -1,0 +1,27 @@
+.profile button {
+  cursor: pointer;
+  border-radius: 100%;
+  overflow: hidden;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+.navbar-toggler:focus {
+}
+.navbar-toggler:focus{
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+
+}
+.navbar {
+  background-color: #23364d !important;
+}
+.navbar .search_icon {
+  cursor: pointer;
+}
+@media (max-width: 992px) {
+  .navbar-expand-lg .navbar-collapse {
+    display: none !important;
+  }
+}

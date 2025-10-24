@@ -15,7 +15,7 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  border-radius: 0 20px 0px 0;
+  border-radius: 0 15px 15px 0;
 }
 
 .characters-container {
@@ -36,12 +36,10 @@
   justify-content: center;
   font-size: 24px;
 }
-
+/* Satrt orange */
 .orange-half {
-  /* width: 280px;
-  height: 140px; */
   width: 180px;
-  height: 90px;
+  height: 105px;
   background: #ff8844;
   border-radius: 180px 180px 0 0;
   bottom: 50px;
@@ -53,24 +51,50 @@
   z-index: 5;
   overflow: hidden;
 
-  /* transform: translate(-50%, -50%) scale(1); */
   animation: orangeStart 1s ease-in-out forwards;
 }
 @keyframes orangeStart {
   0% {
-    /* transform: translate(-50%, -50%) ; */
     border-radius: 100%;
     width: 80px;
     height: 80px;
   }
   50% {
-    /* transform: translate(-50%, -50%) ; */
     border-radius: 90px 90px 0 0;
     width: 180px;
     height: 90px;
   }
   100% {
     border-radius: 180px 180px 0 0;
+  }
+}
+.orange-half.active {
+  width: 280px;
+  height: 150px;
+  background: #ff8844;
+  border-radius: 180px 180px 0 0;
+  bottom: 50px;
+  left: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 25px;
+  z-index: 5;
+  overflow: hidden;
+  animation: orangeStartActive 8s ease-in-out forwards;
+}
+@keyframes orangeStartActive {
+  0% {
+    width: 200px;
+    height: 105px;
+  }
+  50% {
+    width: 200px;
+    height: 105px;
+  }
+  100% {
+    width: 280px;
+    height: 150px;
   }
 }
 .orange-half .eyes {
@@ -81,28 +105,6 @@
   gap: 40px;
   top: 10px;
 }
-/* .orange-half .eyes .eye {
-  width: 9px;
-  height: 9px;
-  background-color: black;
-  border-radius: 50%;
-  position: relative;
-  transition: transform 0.3s ease-in-out;
-  animation: blinking 3s infinite ease-in-out;
-  animation-delay: calc(1s * var(--blink-delay, 0));
-  transform-origin: center center;
-}
-
-@keyframes blinking {
-  0%,
-  90%,
-  100% {
-    transform: scaleY(1), translate(0);
-  }
-  95% {
-    transform: scaleY(0.1);
-  }
-} */
 
 .orange-half .eyes .eye {
   width: 10px;
@@ -132,10 +134,24 @@
   position: absolute;
   background-color: #000;
   width: 30px;
-  height: 12px;
+  height: 13px;
   top: 60px;
   border-radius: 0 0 12.5px 12.5px;
   transition: 0.5s;
+  /* animation: talk 3s infinite ease-in-out; */
+  /* animation-delay: calc(1s * var(--blink-delay, 0)); */
+}
+
+@keyframes talk {
+  0%,
+  100% {
+    height: 15px;
+    border-radius: 0 0 50px 50px;
+  }
+  50% {
+    height: 10px;
+    border-radius: 50%;
+  }
 }
 
 .orange-half.active:hover .mouth {
@@ -153,6 +169,8 @@
 .head {
   z-index: 9999;
 }
+/* End orange */
+/* start  blue */
 .purple-rect {
   width: 80px;
   height: 170px;
@@ -160,11 +178,48 @@
   bottom: 50px;
   left: 90px;
   border-radius: 1px;
-  z-index: 2;
+  /* position: relative; */
+}
+
+.blue_head {
+  position: absolute;
+  width: 100%;
+  height: 70px;
+  background: #6633ff;
+  top: 0px;
+  left: 0px;
+  border: #6633ff solid 5px;
+  transition: top 0.5s, left 0.7s 0.1s;
+}
+.blue_head .mouth_blue {
+  position: absolute;
+  background-color: #000;
+  width: 30px;
+  height: 2px;
+  top: 40px;
+  left: 25px;
+  border-radius: 0 0 12.5px 12.5px;
+  transition: 0.3s;
+}
+.blue_head .mouth_blue.active {
+  width: 2px;
+  height: 25px;
+  top: 20px;
+  left: 50%;
+}
+.blue_head .eye {
+  border: solid 1.5px black;
+  top: 10px;
+}
+
+/* .blue_head.active { */
+.blue_head.active {
+  transform: skew(347deg, 10deg);
+  top: -63px;
+  left: 7.5px;
 }
 
 .purple-rect .eyes {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -174,7 +229,7 @@
 .purple-rect .eyes .eye {
   width: 10px;
   height: 10px;
-  background-color: black;
+  /* background-color: black; */
   border-radius: 50%;
   position: relative;
   /* transition: transform 0.3s ease-in-out; */
@@ -194,23 +249,63 @@
   transition: 0.5s;
 }
 
-.purple-rect.active:hover .mouth {
+.purple-rect.active:hover .mouth_blue {
   width: 20px;
   height: 15px;
   transform: translateX(20px);
   border-radius: 100%;
 }
+/* End blue */
+/* Satrt black */
 
 .black-rect {
-  width: 60px;
-  height: 115px;
+  position: absolute;
+  width: 70px;
+  height: 120px;
   background: #2a2a2a;
   bottom: 50px;
   left: 150px;
   z-index: 3;
 }
+.black-rect .eyes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  top: 15px;
+}
+.black-rect .eyes .eye {
+  border-radius: 50%;
+  position: relative;
+  animation: blinking 3s infinite ease-in-out;
+  animation-delay: calc(1s * var(--blink-delay, 0));
+  transform: var(--eye-transform, translate(0, 0)) scaleY(var(--eye-scale, 1));
+  transform-origin: center center;
+}
 
+.black-rect .mouth_yellow {
+  position: absolute;
+  background-color: #000;
+  width: 20px;
+  height: 5px;
+  top: 40px;
+  left: 50px;
+  border-radius: 5px;
+  transition: 0.5s;
+}
+
+.black-rect.active:hover .mouth_blue {
+  width: 20px;
+  height: 15px;
+  transform: translateX(20px);
+  border-radius: 100%;
+}
+/* End black */
+
+/* start yellow */
 .yellow-pill {
+  position: absolute;
   width: 70px;
   height: 90px;
   background: #ffd43b;
@@ -219,6 +314,45 @@
   border-radius: 35px 35px 0 0;
   z-index: 4;
 }
+
+.yellow-pill .eyes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  position: relative;
+  top: 15px;
+}
+.yellow-pill .eyes .eye {
+  border-radius: 50%;
+  position: relative;
+  animation: blinking 3s infinite ease-in-out;
+  animation-delay: calc(1s * var(--blink-delay, 0));
+  transform: var(--eye-transform, translate(0, 0)) scaleY(var(--eye-scale, 1));
+  transform-origin: center center;
+  border: 2px solid #fff;
+}
+
+.yellow-pill .mouth_yellow {
+  position: absolute;
+  background-color: #000;
+  width: 20px;
+  height: 5px;
+  top: 40px;
+  left: 50px;
+  border-radius: 5px;
+  transition: 0.5s;
+}
+
+.yellow-pill.active:hover .mouth_blue {
+  width: 20px;
+  height: 15px;
+  transform: translateX(20px);
+  border-radius: 100%;
+}
+/* end yellow */
+
+/* **************************************  Start Right section ******************************************* */
 
 .right-section {
   flex: 1;
@@ -407,7 +541,7 @@ input.error {
   background: #49bbbd;
 }
 
-/* ******************* */
+/* ******** Left section *********** */
 
 #toggle-container {
   background-color: var(--color-light-teal);
