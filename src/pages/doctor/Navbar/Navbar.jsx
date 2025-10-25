@@ -5,7 +5,7 @@ import { IoSearch } from "react-icons/io5";
 
 function Navbar() {
   return (
-    <nav className='navbar navbar-expand-lg '>
+    <nav className='navbar navbar-expand-lg   d-block'>
       <div className=' container d-flex  align-items-center  justify-content-between '>
         <a className='navbar-brand text-light' href='#'>
           DEMO LOGO
@@ -23,7 +23,6 @@ function Navbar() {
           </button>
         </div>
 
-        
         <div
           className='collapse  navbar-collapse d-flex align-items-center justify-content-end gap-1'
           id='navbarSupportedContent'>
