@@ -1,17 +1,22 @@
+import { useContext } from "react";
 import Portfolio from "../../../images/porfolio.png";
 import "./Navbar.css";
 // React Icons
 import { IoSearch } from "react-icons/io5";
+import { UserContext } from "../../services/context";
 
 function Navbar() {
+  const { isOpen, setIsOpen } = useContext(UserContext);
+
   return (
-    <nav className='navbar navbar-expand-lg   d-block'>
+    <nav className='navbar navbar-expand-lg  d-block'>
       <div className=' container d-flex  align-items-center  justify-content-between '>
         <a className='navbar-brand text-light' href='#'>
           DEMO LOGO
         </a>
         <div className='menu_button'>
           <button
+            onClick={() => setIsOpen(!isOpen)}
             className='navbar-toggler bg-white'
             type='button'
             data-bs-toggle='collapse'
@@ -38,7 +43,7 @@ function Navbar() {
             </span>
           </form>
           <div className='profile px-4 '>
-            <button className='border-0'>
+            <button className='border-0' onClick={() => setIsOpen(!isOpen)}>
               <img
                 className=' rounded-circle '
                 src={Portfolio}

@@ -1,16 +1,19 @@
 .sidebar {
+  position: relative;
   width: 240px;
-  height: 95vh;
+  height: calc(100vh - 56px);
   transition: all 0.3s ease;
   top: 0;
-  left: -240px;
+  /* left: -240px; */
+  transform: translateX(-240px);
   overflow-y: auto;
   z-index: 1000;
   background-color: #23364d;
 }
 
 .sidebar.open {
-  left: 0;
+  /* left: 0; */
+  transform: translateX(0px);
 }
 
 .toggle-btn {
@@ -27,9 +30,14 @@
   border-radius: 8px;
   transition: 0.3s;
 }
-.button_box{
-  
-    background-color: #0d6efd;
+.sidebar ul .active  li{
+  background-color: #0d6efd;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.button_box {
+  background-color: #0d6efd;
   border-radius: 8px;
 }
 
@@ -39,7 +47,7 @@
 }
 
 @media (min-width: 992px) {
-  .sidebar {
+  .sidebar.open {
     left: 0;
   }
   .toggle-btn {

@@ -8,11 +8,10 @@
 }
 .navbar-toggler:focus {
 }
-.navbar-toggler:focus{
-    outline: none !important;
-    border: none !important;
-    box-shadow: none !important;
-
+.navbar-toggler:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 .navbar {
   background-color: #23364d !important;
