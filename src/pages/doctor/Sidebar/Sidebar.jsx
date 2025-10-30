@@ -22,7 +22,7 @@ export default function Sidebar() {
           <FaArrowRight />
         </button>
       )}
-      <div className='d-flex  position-fixed z-3'>
+      <div className={`d-flex  position-fixed  z-3`}>
         <div className={`sidebar  text-light ${isOpen ? "open" : ""}`}>
           <h4 className='text-center py-3 border-bottom d-flex align-items-center'>
             <span className=' '>

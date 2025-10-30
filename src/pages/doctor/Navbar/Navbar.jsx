@@ -9,7 +9,7 @@ function Navbar() {
   const { isOpen, setIsOpen } = useContext(UserContext);
 
   return (
-    <nav className='navbar navbar-expand-lg  d-block'>
+    <nav className='navbar navbar-expand-lg  d-blok position-fixed '>
       <div className=' container d-flex  align-items-center  justify-content-between '>
         <a className='navbar-brand text-light' href='#'>
           DEMO LOGO
