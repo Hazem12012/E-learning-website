@@ -17,7 +17,7 @@ export default function Sidebar() {
     <>
       {!isOpen && (
         <button
-          className='btn  open_sidepar_icon '
+          className='btn  open_sidepar_icon  '
           onClick={() => setIsOpen(!isOpen)}>
           <FaArrowRight />
         </button>
@@ -28,7 +28,7 @@ export default function Sidebar() {
             <span className=' '>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className='btn  text-white align-items-center d-flex  fs-3'>
+                className='btn  text-white align-items-center d-flex  fs-4'>
                 <IoMdArrowRoundBack />
               </button>
             </span>

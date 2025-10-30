@@ -21,6 +21,7 @@ nav {
 }
 .navbar {
   background-color: #23364d !important;
+  padding: 35px 0;
 }
 .navbar .search_icon {
   cursor: pointer;
