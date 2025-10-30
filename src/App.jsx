@@ -5,6 +5,7 @@ import Layout from "./pages/Layout/Layout.jsx";
 import Home from "./pages/doctor/Home/Home.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
 import Courses from "./pages/doctor/Cources/Courses.jsx";
+import Login_Register from "./pages/login/Login_Register.jsx";
 function App() {
   const [isOpen, setIsOpen] = useState(true);
 
@@ -33,6 +34,11 @@ function App() {
           element: <Courses />,
         },
       ],
+    },
+
+    {
+      element: <Login_Register />,
+      path: "login",
     },
   ]);
   return <RouterProvider router={router} />;

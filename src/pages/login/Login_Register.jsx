@@ -1,37 +1,40 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import "./Login.css";
 import Eyes from "./Eyes";
+import LeftSectionAnimation from "./LeftSectionAnimation";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
-function reducer(state, action) {
-  switch (action.type) {
-    case "FOCUS_EMAIL":
-      return {
-        state,
-      };
-    case "FOCUS_PASSWORD":
-      return {
-        state,
-      };
-    case "HIDDEN_PASSWORD":
-      return {
-        state,
-      };
-    case "WRONG_INPUT":
-      return {
-        state,
-      };
-    case "SUBMIT_FORM":
-      return {
-        state,
-      };
-    case "CHANGE_FORM":
-      return {
-        state,
-      };
-    default:
-      return state;
-  }
-}
+
+// function reducer(state, action) {
+//   switch (action.type) {
+//     case "FOCUS_EMAIL":
+//       return {
+//         state,
+//       };
+//     case "FOCUS_PASSWORD":
+//       return {
+//         state,
+//       };
+//     case "HIDDEN_PASSWORD":
+//       return {
+//         state,
+//       };
+//     case "WRONG_INPUT":
+//       return {
+//         state,
+//       };
+//     case "SUBMIT_FORM":
+//       return {
+//         state,
+//       };
+//     case "CHANGE_FORM":
+//       return {
+//         state,
+//       };
+//     default:
+//       return state;
+//   }
+// }
 
 function Login_Register() {
   const [isLogin, setisLogin] = useState(false);
@@ -68,63 +71,14 @@ function Login_Register() {
 
   const initialState = {};
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  // const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
     <div className='login_box d-flex'>
       {/* Left Section */}
-      <div className='left-section'>
-        <div className='characters-container' id='characters'>
-          {/* Satrt orange */}
-          <div className={`character orange-half ${"fjlsdkf"}  `}>
-            <div className='head d-flex align-items-center justify-content-center'>
-              <Eyes color={"black"} width={"10px"} height={"10px"} />
-              <div className='mouth'></div>
-            </div>
-          </div>
-          {/* end orange */}
-          {/* Start blue */}
-          <div className='character purple-rect'>
-            <div className=' d-flex align-items-center justify-content-center'>
-              <div className='blue_head'>
-                <Eyes
-                  color={"white"}
-                  width={"10px"}
-                  height={"9px"}
-                  delay={"2s"}
-                />
-                <div className='mouth_blue'></div>
-              </div>
-            </div>
-          </div>
-          {/* End blue */}
-          {/* Start black */}
-          <div className='character black-rect'>
-            <div className='head d-flex align-items-center justify-content-center'>
-              <Eyes
-                color={"white"}
-                width={"9px"}
-                height={"9px"}
-                delay={".6s"}
-              />
-            </div>
-          </div>
-          {/* End Black */}
-          {/* Start yellow */}
-          <div className='character yellow-pill'>
-            <div className='head d-flex align-items-center justify-content-center'>
-              <Eyes
-                color={"black"}
-                width={"10px"}
-                height={"10px"}
-                delay={"2.3s"}
-              />
-              <div className="mouth_yellow"></div>
-            </div>
-          </div>
-          {/* End yellow */}
-        </div>
-      </div>
+
+      {/* <LeftSectionAnimation /> */}
+
       {/*  */}
       {/* Right Section */}
       <div className='right-section'>
@@ -162,7 +116,7 @@ function Login_Register() {
             className={`${
               isLogin ? "title_animation_1" : "title_animation_2"
             }`}>
-            {isLogin ? "Welcome back" : "Welcome"}
+            {isLogin ? "Welcome" : "Welcome back"}
           </h1>
           <div className='forms_container'>
             <div
@@ -184,7 +138,19 @@ function Login_Register() {
                       <div className='error-message'>{emailError}</div>
                     )}
                   </div>
-
+{/* id */}
+                  <div className='form-group'>
+                    <label htmlFor='email'>ID</label>
+                    <input
+                      type='email'
+                      id='email'
+                      ref={emailRef}
+                      placeholder='email@gmail.com'
+                    />
+                    {emailError && (
+                      <div className='error-message'>{emailError}</div>
+                    )}
+                  </div>
                   {/* Password */}
                   <div className='form-group'>
                     <label htmlFor='password'>Password</label>
@@ -197,9 +163,9 @@ function Login_Register() {
                       />
                       <button
                         type='button'
-                        className='toggle-password'
+                        className='toggle-password  '
                         onClick={() => setShowPassword((prev) => !prev)}>
-                        {showPassword ? "Hide" : "Show"}
+                        {showPassword ? <FiEye /> : <FiEyeOff />}
                       </button>
                     </div>
                     {passwordError && (
@@ -222,7 +188,7 @@ function Login_Register() {
                         type='button'
                         className='toggle-password'
                         onClick={() => setShowConfirmPassword((prev) => !prev)}>
-                        {showConrirmPassword ? "Hide" : "Show"}
+                        {showConrirmPassword ? <FiEye /> : <FiEyeOff />}
                       </button>
                     </div>
                     {passwordError && (
@@ -230,12 +196,12 @@ function Login_Register() {
                     )}
                   </div>
 
-                  {/* <div className='remember-forgot'>
-                    <a href='#' className='forgot-password'>
-                      Forgot Password?
-                    </a>
-                  </div> */}
-
+                  <div className='remember-forgot'>
+                    <label className='remember-me'>
+                      <input type='checkbox' />
+                      <span>I am a teacher</span>
+                    </label>
+                  </div>
                   <button type='submit' className='login-btn'>
                     Register
                   </button>
@@ -271,7 +237,7 @@ function Login_Register() {
                         type='button'
                         className='toggle-password'
                         onClick={() => setShowPassword((prev) => !prev)}>
-                        {showPassword ? "Hide" : "Show"}
+                        {showPassword ? <FiEye /> : <FiEyeOff />}
                       </button>
                     </div>
                     {passwordError && (
