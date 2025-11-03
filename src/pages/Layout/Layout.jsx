@@ -1,8 +1,7 @@
 import Navbar from "./../doctor/Navbar/Navbar";
 import Sidebar from "../doctor/Sidebar/Sidebar";
-import { useContext } from "react";
-import { UserContext } from "../services/context";
 import { Outlet } from "react-router-dom";
+import "./Layout.css";
 
 function Layout() {
   return (
@@ -11,7 +10,9 @@ function Layout() {
       <div className=' page_container d-block'>
         <Sidebar />
         {/* ********{ Home /  Profile / Cources }************ */}
-        <Outlet />
+        <div className="layout_content">
+          <Outlet />
+        </div>
         {/* **********{End}********** */}
       </div>
     </>

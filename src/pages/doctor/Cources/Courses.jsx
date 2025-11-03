@@ -161,7 +161,7 @@ export default function Courses() {
       </div>
 
       <div className='container course_container'>
-        <div className='category-filter'>
+        <div className='category-filter  d-flex align-items-center justify-content-center'>
           {categories.map((category) => (
             <button
               key={category}

@@ -22,8 +22,10 @@ export default function Sidebar() {
           <FaArrowRight />
         </button>
       )}
-      <div className={`d-flex  position-fixed  z-3`}>
-        <div className={`sidebar  text-light ${isOpen ? "open" : ""}`}>
+      <div className={`d-flex  position-fixed  z-3 `}>
+        <div
+          className={`sidebar  text-light ${isOpen ? "open" : ""}`}
+          style={isOpen ? { width: "240px" } : { width: "0px" }}>
           <h4 className='text-center py-3 border-bottom d-flex align-items-center'>
             <span className=' '>
               <button
@@ -59,10 +61,12 @@ export default function Sidebar() {
               </NavLink>
             </ul>
             <div className='button_box d-flex align-items-center justify-content-center  mx-3'>
+                <Link to={"/login"}>
               <button className='btn  text-white  fs-6 fw-bold  '>
                 {" "}
                 Logout
               </button>
+                </Link>
               <span className='fs-5'>
                 <HiOutlineLogout />
               </span>
