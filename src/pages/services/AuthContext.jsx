@@ -8,11 +8,17 @@ export const AuthContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // ✅ Register new user
-  const registerNewUser = async (email, password) => {
+  const registerNewUser = async (email, password, naturalId, teacher) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            naturalId: naturalId,
+            role: teacher ? "teacher" : "student",
+          },
+        },
       });
 
       if (error) throw error;
@@ -24,14 +30,33 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   // ✅ Sign in user
-  const signInUser = async (email, password) => {
+  const signInUser = async (email, password, teacher) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
       if (error) throw error;
-      return { success: true, data };
+
+      const user = data.user;
+      const role = user?.user_metadata?.role;
+      const expectedRole = teacher ? "teacher" : "student";
+
+      if (!role) {
+        throw new Error("No role assigned to this user.");
+      }
+
+      // ✅ Check if user role matches checkbox
+      if (role !== expectedRole) {
+        throw new Error(
+          `Access denied: this account is not a ${expectedRole}.`
+        );
+      }
+
+      // ✅ Success
+      console.log(`✅ Logged in as ${role}:`, user.email);
+      return { success: true, data, role };
     } catch (error) {
       console.error("An error occurred while signing in:", error.message);
       return { success: false, error };

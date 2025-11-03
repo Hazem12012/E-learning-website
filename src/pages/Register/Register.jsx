@@ -26,6 +26,21 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const result = await registerNewUser(email, password, naturalId, teacher);
+
+    if (result.success) {
+      alert("Account created successfully!");
+      console.log("Supabase user:", result.data);
+    } else {
+      alert("Error: " + result.error.message);
+    }
+
+    // ✅ Get user info after login
+    const user = result.data.user;
+    const userRole = user?.user_metadata?.role;
+
+    console.log("User logged in with role:", userRole);
     let valid = true;
 
     // validate email
@@ -52,14 +67,6 @@ function Register() {
     if (!valid) return;
 
     // call Supabase
-    const result = await registerNewUser(email, password);
-
-    if (result.success) {
-      alert("Account created successfully!");
-      console.log("Supabase user:", result.data);
-    } else {
-      alert("Error: " + result.error.message);
-    }
   };
 
   return (

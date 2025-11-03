@@ -1,32 +1,23 @@
-import { useRef, useState } from "react";
-// import "./Login.css";
+import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link } from "react-router-dom";
-// import Register from "../Register/Register";
+import { UserAuth } from "../services/AuthContext";
 
 function Login() {
-  const [isLogin, setisLogin] = useState(false);
-  const emailRef = useRef(null);
-  const passwordRef = useRef(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConrirmPassword, setShowConfirmPassword] = useState(false);
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-
-  // inpot info
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [teacher, setTeacher] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [message, setMessage] = useState("");
 
-  // ****************************************************
+  const { signInUser } = UserAuth();
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const email = emailRef.current.value;
-    const password = passwordRef.current.value;
     let valid = true;
 
     if (!validateEmail(email)) {
@@ -39,23 +30,32 @@ function Login() {
       valid = false;
     } else setPasswordError("");
 
-    if (valid) {
-      console.log("Login successful!");
+    if (!valid) return;
+
+    // ✅ Call Supabase login
+    const result = await signInUser(email, password, teacher);
+
+    if (result.success) {
+      setMessage("✅ Login successful!");
       setPassword("");
       setEmail("");
       setTeacher(false);
+    } else {
+      setMessage(`❌ ${result.error.message}`);
     }
   };
+
   return (
     <div className='form_box register'>
-      <form onSubmit={handleSubmit} className=''>
+      {/* Message */}
+      {message && <p>{message}</p>}
+      <form onSubmit={handleSubmit}>
         {/* Email */}
         <div className='form-group'>
           <label htmlFor='email'>Email</label>
           <input
             type='email'
             id='email'
-            ref={emailRef}
             placeholder='email@gmail.com'
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -70,7 +70,6 @@ function Login() {
             <input
               type={showPassword ? "text" : "password"}
               id='password'
-              ref={passwordRef}
               placeholder='***************'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -86,6 +85,8 @@ function Login() {
             <div className='error-message'>{passwordError}</div>
           )}
         </div>
+
+        {/* Teacher checkbox */}
         <div className='remember-forgot'>
           <label className='remember-me'>
             <input
@@ -99,6 +100,7 @@ function Login() {
             Forgot Password?
           </Link>
         </div>
+
         <button type='submit' className='login-btn'>
           Log in
         </button>
