@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./Register.css";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { UserAuth } from "../services/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +22,7 @@ function Register() {
 
   // Supabase auth
   const { registerNewUser } = UserAuth();
+  const navigate = useNavigate();
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -31,6 +33,7 @@ function Register() {
 
     if (result.success) {
       alert("Account created successfully!");
+      navigate("/login");
       console.log("Supabase user:", result.data);
     } else {
       alert("Error: " + result.error.message);
@@ -72,92 +75,97 @@ function Register() {
   return (
     <div className='form_box login'>
       <form onSubmit={handleSubmit}>
-        {/* Email */}
-        <div className='form-group'>
-          <label htmlFor='email'>Email</label>
-          <input
-            type='email'
-            id='email'
-            placeholder='email@gmail.com'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          {emailError && <div className='error-message'>{emailError}</div>}
-        </div>
-
-        {/* ID */}
-        <div className='form-group'>
-          <label htmlFor='id'>ID</label>
-          <input
-            type='number'
-            id='id'
-            placeholder='Natural ID'
-            value={naturalId}
-            onChange={(e) => setNaturalId(e.target.value)}
-          />
-          {naturalIdError && (
-            <div className='error-message'>{naturalIdError}</div>
-          )}
-        </div>
-
-        {/* Password */}
-        <div className='form-group'>
-          <label htmlFor='password'>Password</label>
-          <div className='password-container'>
+        <div className='input_box'>
+          {/* Email */}
+          <div className='form-group'>
+            <label htmlFor='email'>Email</label>
             <input
-              type={showPassword ? "text" : "password"}
-              id='password'
-              placeholder='***************'
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type='email'
+              id='email'
+              placeholder='email@gmail.com'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-            <button
-              type='button'
-              className='toggle-password'
-              onClick={() => setShowPassword((prev) => !prev)}>
-              {showPassword ? <FiEye /> : <FiEyeOff />}
-            </button>
+            {emailError && <div className='error-message'>{emailError}</div>}
           </div>
-          {passwordError && (
-            <div className='error-message'>{passwordError}</div>
-          )}
-        </div>
 
-        {/* Confirm Password */}
-        <div className='form-group'>
-          <label htmlFor='confirmPassword'>Confirm Password</label>
-          <div className='password-container'>
+          {/* ID */}
+          <div className='form-group'>
+            <label htmlFor='id'>ID</label>
             <input
-              type={showConfirmPassword ? "text" : "password"}
-              id='confirmPassword'
-              placeholder='***************'
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              type='number'
+              id='id'
+              placeholder='Natural ID'
+              value={naturalId}
+              onChange={(e) => setNaturalId(e.target.value)}
             />
-            <button
-              type='button'
-              className='toggle-password'
-              onClick={() => setShowConfirmPassword((prev) => !prev)}>
-              {showConfirmPassword ? <FiEye /> : <FiEyeOff />}
-            </button>
+            {naturalIdError && (
+              <div className='error-message'>{naturalIdError}</div>
+            )}
+          </div>
+
+          {/* Password */}
+          <div className='form-group'>
+            <label htmlFor='password'>Password</label>
+            <div className='password-container'>
+              <input
+                type={showPassword ? "text" : "password"}
+                id='password'
+                placeholder='***************'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type='button'
+                className='toggle-password'
+                onClick={() => setShowPassword((prev) => !prev)}>
+                {showPassword ? <FiEye /> : <FiEyeOff />}
+              </button>
+            </div>
+            {passwordError && (
+              <div className='error-message'>{passwordError}</div>
+            )}
+          </div>
+
+          {/* Confirm Password */}
+          <div className='form-group'>
+            <label htmlFor='confirmPassword'>Confirm Password</label>
+            <div className='password-container'>
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id='confirmPassword'
+                placeholder='***************'
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              <button
+                type='button'
+                className='toggle-password'
+                onClick={() => setShowConfirmPassword((prev) => !prev)}>
+                {showConfirmPassword ? <FiEye /> : <FiEyeOff />}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Teacher Checkbox */}
-        <div className='remember-forgot'>
-          <label className='remember-me'>
-            <input
-              type='checkbox'
-              checked={teacher}
-              onChange={(e) => setTeacher(e.target.checked)}
-            />
-            <span>I am a teacher</span>
-          </label>
-        </div>
+        {/* form footer  */}
+        <div className='form_footer'>
+          {/* Teacher Checkbox */}
+          <div className='remember-forgot'>
+            <label className='remember-me'>
+              <input
+                type='checkbox'
+                checked={teacher}
+                onChange={(e) => setTeacher(e.target.checked)}
+              />
+              <span>I am a teacher</span>
+            </label>
+          </div>
 
-        <button type='submit' className='login-btn'>
-          Register
-        </button>
+          <button type='submit' className='login-btn'>
+            Register
+          </button>
+        </div>
       </form>
     </div>
   );

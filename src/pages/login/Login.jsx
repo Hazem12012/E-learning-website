@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { UserAuth } from "../services/AuthContext";
 
 function Login() {
@@ -13,6 +13,7 @@ function Login() {
   const [message, setMessage] = useState("");
 
   const { signInUser } = UserAuth();
+  const navigate = useNavigate();
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -40,6 +41,7 @@ function Login() {
       setPassword("");
       setEmail("");
       setTeacher(false);
+      navigate("/");
     } else {
       setMessage(`❌ ${result.error.message}`);
     }

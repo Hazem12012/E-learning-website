@@ -275,13 +275,14 @@ input.error {
 .forms_box {
   display: flex;
   align-items: center;
+  /* width: calc(200% - 20px); */
   width: 200%;
   transition: transform 0.6s ease-in-out;
 }
 .forms_box .form_box {
   position: relative;
   width: 50%;
-  overflow: hidden;
+  /* overflow: hidden; */
   padding: 0 10px;
 }
 .forms_box .form_box.login {
@@ -644,3 +645,10 @@ input.error {
 /* end yellow */
 
 /* **************************************  Start Right section ******************************************* */
+
+.form_box {
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  max-height: 300px;
+}
