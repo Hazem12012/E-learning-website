@@ -3,12 +3,14 @@ import "./Register.css";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { UserAuth } from "../services/AuthContext";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // input values
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [naturalId, setNaturalId] = useState("");
   const [password, setPassword] = useState("");
@@ -22,37 +24,19 @@ function Register() {
 
   // Supabase auth
   const { registerNewUser } = UserAuth();
-  const navigate = useNavigate();
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const result = await registerNewUser(email, password, naturalId, teacher);
-
-    if (result.success) {
-      alert("Account created successfully!");
-      navigate("/login");
-      console.log("Supabase user:", result.data);
-    } else {
-      alert("Error: " + result.error.message);
-    }
-
-    // ✅ Get user info after login
-    const user = result.data.user;
-    const userRole = user?.user_metadata?.role;
-
-    console.log("User logged in with role:", userRole);
     let valid = true;
 
-    // validate email
     if (!validateEmail(email)) {
       setEmailError("Please enter a valid email address");
       valid = false;
     } else setEmailError("");
 
-    // validate password
     if (password.length < 6) {
       setPasswordError("Password must be at least 6 characters");
       valid = false;
@@ -61,15 +45,27 @@ function Register() {
       valid = false;
     } else setPasswordError("");
 
-    // validate ID
     if (naturalId.length !== 14) {
-      setNaturalIdError("Natural ID must be 14 digits");
+      setNaturalIdError(`Natural ID must be 14 digits (${naturalId.length})`);
+
       valid = false;
     } else setNaturalIdError("");
 
     if (!valid) return;
 
     // call Supabase
+    const result = await registerNewUser(email, password, naturalId, teacher);
+    const user = result.data.user;
+    const userRole = user?.user_metadata?.role;
+    if (result.success) {
+      toast.success(`Account created successfully`);
+      console.log("Supabase user:", result.data);
+      navigate("/home");
+      // console.log(result.data)
+    } else {
+      toast.error(`${result.error.message}`);
+    }
+    console.log("User logged in with role:", userRole);
   };
 
   return (

@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { UserContext } from "./pages/services/context.jsx";
 import { useState } from "react";
 import Layout from "./pages/Layout/Layout.jsx";
+import { Toaster } from "react-hot-toast";
 import Home from "./pages/doctor/Home/Home.jsx";
 import Profile from "./pages/doctor/Profile/Profile.jsx";
 import Courses from "./pages/doctor/Cources/Courses.jsx";
@@ -65,7 +66,12 @@ function App() {
       path: "*",
     },
   ]);
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <Toaster />
+      <RouterProvider router={router} />
+    </>
+  );
 }
 
 export default App;

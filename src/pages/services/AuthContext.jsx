@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "../../SupabaseClient";
+import { supabase } from "./SupabaseClient";
+import toast from "react-hot-toast";
 
 export const AuthContext = createContext();
 
@@ -7,7 +8,7 @@ export const AuthContextProvider = ({ children }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Register new user
+  //  Register new user
   const registerNewUser = async (email, password, naturalId, teacher) => {
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -25,11 +26,13 @@ export const AuthContextProvider = ({ children }) => {
       return { success: true, data };
     } catch (error) {
       console.error("There was a problem signing up:", error.message);
+
+      toast.error(`${error.message}`);
       return { success: false, error };
     }
   };
 
-  // ✅ Sign in user
+  //  Sign in user
   const signInUser = async (email, password, teacher) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -49,9 +52,7 @@ export const AuthContextProvider = ({ children }) => {
 
       // ✅ Check if user role matches checkbox
       if (role !== expectedRole) {
-        throw new Error(
-          `Access denied: this account is not a ${expectedRole}.`
-        );
+        throw new Error(`This account is not a ${expectedRole}.`);
       }
 
       // ✅ Success
@@ -63,13 +64,17 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-  // ✅ Sign out user
+  //  Sign out user
   const signOutUser = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) console.error("There was an error signing out:", error.message);
+    if (error) {
+      toast.error("Error signing out");
+      return false;
+    }
+    return true;
   };
 
-  // ✅ Listen to session changes
+  //  Listen to session changes
   useEffect(() => {
     const getSession = async () => {
       const {

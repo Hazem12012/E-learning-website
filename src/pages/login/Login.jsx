@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { UserAuth } from "../services/AuthContext";
+import toast from "react-hot-toast";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -10,7 +11,6 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [message, setMessage] = useState("");
 
   const { signInUser } = UserAuth();
   const navigate = useNavigate();
@@ -37,20 +37,20 @@ function Login() {
     const result = await signInUser(email, password, teacher);
 
     if (result.success) {
-      setMessage("✅ Login successful!");
+      toast.success("Login successful");
       setPassword("");
       setEmail("");
       setTeacher(false);
-      navigate("/");
+      navigate("/home");
     } else {
-      setMessage(`❌ ${result.error.message}`);
+      toast.error(`${result.error.message}`);
     }
   };
 
   return (
     <div className='form_box register'>
       {/* Message */}
-      {message && <p>{message}</p>}
+      {/* {message && <p>{message}</p>} */}
       <form onSubmit={handleSubmit}>
         {/* Email */}
         <div className='form-group'>

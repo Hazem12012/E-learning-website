@@ -1,17 +1,25 @@
 import React, { useContext, useState } from "react";
 import { FaHome, FaBook, FaUser, FaBars } from "react-icons/fa";
 import { HiOutlineLogout } from "react-icons/hi";
-import { IoMdClose } from "react-icons/io";
 import { IoMdArrowRoundBack } from "react-icons/io";
 
 import "./Sidebar.css";
 import { UserContext } from "../../services/context";
-import { Link, NavLink } from "react-router-dom";
-import { DiVim } from "react-icons/di";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
+import { UserAuth } from "../../services/AuthContext";
 
 export default function Sidebar() {
+  const navigate = useNavigate();
   const { isOpen, setIsOpen } = useContext(UserContext);
+  const { signOutUser } = UserAuth();
+
+  async function handleLogout() {
+    const success = await signOutUser();
+    if (success) {
+      navigate("/login");
+    }
+  }
 
   return (
     <>
@@ -60,17 +68,14 @@ export default function Sidebar() {
                 </li>
               </NavLink>
             </ul>
-            <div className='button_box d-flex align-items-center justify-content-center  mx-3'>
-                <Link to={"/login"}>
-              <button className='btn  text-white  fs-6 fw-bold  '>
-                {" "}
-                Logout
-              </button>
-                </Link>
-              <span className='fs-5'>
+            <button
+              onClick={handleLogout}
+              className='button_box border-0 d-flex align-items-center justify-content-center  mx-3'>
+              <div className='btn  text-white  fs-6 fw-bold  '> Logout</div>
+              <span className='fs-5  text-white'>
                 <HiOutlineLogout />
               </span>
-            </div>
+            </button>
           </div>
         </div>
       </div>
