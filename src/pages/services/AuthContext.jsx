@@ -83,7 +83,7 @@ export const AuthContextProvider = ({ children }) => {
       setSession(session);
       setLoading(false);
     };
-
+    
     getSession();
 
     const { data: listener } = supabase.auth.onAuthStateChange(
@@ -91,11 +91,12 @@ export const AuthContextProvider = ({ children }) => {
         setSession(session);
       }
     );
-
+    
     return () => {
       listener.subscription.unsubscribe();
     };
   }, []);
+  console.log(session);
 
   return (
     <AuthContext.Provider

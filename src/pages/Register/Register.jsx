@@ -58,14 +58,17 @@ function Register() {
     const user = result.data.user;
     const userRole = user?.user_metadata?.role;
     if (result.success) {
-      toast.success(`Account created successfully`);
+      await toast.success(`Account created successfully`);
       console.log("Supabase user:", result.data);
-      navigate("/home");
+      await navigate("/home");
       // console.log(result.data)
     } else {
       toast.error(`${result.error.message}`);
     }
     console.log("User logged in with role:", userRole);
+
+    console.log("User logged in with role:", result);
+
   };
 
   return (

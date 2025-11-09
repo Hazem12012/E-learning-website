@@ -37,11 +37,11 @@ function Login() {
     const result = await signInUser(email, password, teacher);
 
     if (result.success) {
-      toast.success("Login successful");
       setPassword("");
       setEmail("");
       setTeacher(false);
-      navigate("/home");
+      await toast.success("Login successful");
+      await navigate("/home");
     } else {
       toast.error(`${result.error.message}`);
     }

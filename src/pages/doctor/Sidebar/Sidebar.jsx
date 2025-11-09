@@ -8,6 +8,7 @@ import { UserContext } from "../../services/context";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { UserAuth } from "../../services/AuthContext";
+import toast from "react-hot-toast";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function Sidebar() {
   async function handleLogout() {
     const success = await signOutUser();
     if (success) {
+      toast.success("Logged out successfully!");
       navigate("/login");
     }
   }
