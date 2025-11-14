@@ -43,12 +43,21 @@ function App() {
 
         {
           path: "/profile",
-          element: <Profile />,
+
+          element: (
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          ),
         },
 
         {
           path: "/cources",
-          element: <Courses />,
+          element: (
+            <PrivateRoute>
+              <Courses />
+            </PrivateRoute>
+          ),
         },
       ],
     },
@@ -83,7 +92,6 @@ function App() {
       <Toaster
         containerStyle={{
           top: 80,
-
         }}
         toastOptions={{
           className: "",

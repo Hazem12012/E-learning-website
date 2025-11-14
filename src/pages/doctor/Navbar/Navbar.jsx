@@ -12,7 +12,7 @@ function Navbar() {
     <nav className='navbar navbar-expand-lg  d-blok position-fixed '>
       <div className=' container d-flex  align-items-center  justify-content-between '>
         <a className='navbar-brand text-light' href='#'>
-          DEMO LOGO
+          Demo Logo
         </a>
         <div className='menu_button'>
           <button

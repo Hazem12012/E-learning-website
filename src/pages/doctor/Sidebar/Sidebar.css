@@ -2,8 +2,8 @@
   position: relative;
   width: 240px;
   height: calc(100vh);
-  transition: all 0.2s  ease-in-out;
-  
+  transition: all 0.2s ease-in-out;
+
   top: 0;
   left: -240px;
   transform: translateX(-240px);
@@ -71,4 +71,10 @@
   font-size: 20px;
   z-index: 9999;
   margin: auto;
+}
+
+@media (max-height: 510px) {
+  .sidebar .side_box {
+    justify-content: initial !important;
+  }
 }

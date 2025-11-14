@@ -46,7 +46,7 @@ export default function Sidebar() {
             </span>
             Dashboard
           </h4>
-          <div className='d-flex flex-column justify-content-between h-75 '>
+          <div className='side_box d-flex flex-column justify-content-between h-75  '>
             <ul className='list-unstyled p-2 mt-3 '>
               <NavLink
                 to={`/home`}
@@ -72,7 +72,7 @@ export default function Sidebar() {
             </ul>
             <button
               onClick={handleLogout}
-              className='button_box border-0 d-flex align-items-center justify-content-center  mx-3'>
+              className='button_box border-0 d-flex align-items-center justify-content-center  mx-3 mb-4 '>
               <div className='btn  text-white  fs-6 fw-bold  '> Logout</div>
               <span className='fs-5  text-white'>
                 <HiOutlineLogout />
