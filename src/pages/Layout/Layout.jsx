@@ -7,8 +7,8 @@ function Layout() {
   return (
     <>
       <Navbar />
-      <div className=' page_container d-block'>
         <Sidebar />
+      <div className=' page_container d-block'>
         {/* ********{ Home /  Profile / Cources }************ */}
         <div className="layout_content">
           <Outlet />
