@@ -14,7 +14,7 @@ import ForgotPassword from "./pages/ForgotPassword/ForgotPassword.jsx";
 import PrivateRoute from "./pages/services/PrivateRoute.jsx";
 
 function App() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const router = createBrowserRouter([
     {

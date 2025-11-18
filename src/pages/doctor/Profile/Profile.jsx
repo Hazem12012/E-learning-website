@@ -5,6 +5,7 @@ import Portfolio from "../../../images/porfolio.png";
 import { FiMail, FiUser, FiShield, FiEdit2, FiSave, FiX, FiLock, FiType } from "react-icons/fi";
 import toast from "react-hot-toast";
 import "./Profile.css";
+import { Mail, User, IdCard, Phone, Shield, Calendar } from "lucide-react";
 
 export default function Profile() {
   const { session } = UserAuth();
@@ -80,7 +81,7 @@ export default function Profile() {
 
       toast.success("Profile updated successfully!");
       setIsEditing(false);
-      
+
       // Clear password fields
       setFormData((prev) => ({
         ...prev,
@@ -109,8 +110,8 @@ export default function Profile() {
   // View Mode - Simple and Pretty Design
   if (!isEditing) {
     return (
-      <div className="profile-container">
-        <div className="profile-card">
+      <div className="profile-container main-profile-container ">
+        <div className="profile-card main-profile-card">
           <div className="profile-header">
             <div className="profile-avatar">
               <img src={Portfolio} alt="Profile" />
@@ -120,12 +121,13 @@ export default function Profile() {
             </h2>
             <p className="profile-role">
               {userMetadata?.role === "teacher"
-                ? "👨‍🏫 Teacher"
-                : "👨‍🎓 Student"}
+                ? " Teacher"
+                : " Student"}
             </p>
           </div>
+          {/* Start pinned info */}
 
-          <div className="profile-info">
+          {/* <div className="profile-info">
             <div className="info-item">
               <FiMail className="info-icon" />
               <div className="info-content">
@@ -147,13 +149,70 @@ export default function Profile() {
             <div className="info-item">
               <FiShield className="info-icon" />
               <div className="info-content">
-                <span className="info-label">Role</span>
+                <span className="info-label">Enrollment year</span>
                 <span className="info-value">
                   {userMetadata?.role?.toUpperCase() || "N/A"}
                 </span>
               </div>
             </div>
+          </div> */}
+
+          <div className="profile-card">
+            <h2 className="card-title">Profile Information</h2>
+
+            <div className="info-grid">
+
+              <div className="info-item">
+                <User className="info-icon" />
+                <div>
+                  <p className="label">Full Name</p>
+                  <p className="value">{user.fullName}</p>
+                </div>
+              </div>
+
+              <div className="info-item">
+                <Mail className="info-icon" />
+                <div>
+                  <p className="label">Email</p>
+                  <p className="value">{user.email}</p>
+                </div>
+              </div>
+
+              <div className="info-item">
+                <IdCard className="info-icon" />
+                <div>
+                  <p className="label">National ID</p>
+                  <p className="value">{user.nationalId}</p>
+                </div>
+              </div>
+
+              <div className="info-item">
+                <Phone className="info-icon" />
+                <div>
+                  <p className="label">Phone</p>
+                  <p className="value">{user.phone}</p>
+                </div>
+              </div>
+
+              <div className="info-item">
+                <Shield className="info-icon" />
+                <div>
+                  <p className="label">Role</p>
+                  <p className="value">{user.role}</p>
+                </div>
+              </div>
+
+              <div className="info-item">
+                <Calendar className="info-icon" />
+                <div>
+                  <p className="label">Joined Date</p>
+                  <p className="value">{user.joinDate}</p>
+                </div>
+              </div>
+
+            </div>
           </div>
+          {/* end pinned info */}
 
           <div className="text-center mt-4">
             <button
@@ -189,8 +248,8 @@ export default function Profile() {
                   </h2>
                   <span className="badge bg-primary fs-6">
                     {userMetadata?.role === "teacher"
-                      ? "👨‍🏫 Teacher"
-                      : "👨‍🎓 Student"}
+                      ? "Teacher"
+                      : "Student"}
                   </span>
                 </div>
 
@@ -263,7 +322,7 @@ export default function Profile() {
                       <FiLock className="me-2" />
                       Change Password
                     </h6>
-                    
+
                     <div className="mb-3">
                       <label className="form-label text-muted small text-uppercase mb-1">
                         New Password

@@ -1,3 +1,4 @@
 .layout_content {
-  padding-top: 70px;
+  height: calc(100vh - 70px);
+  transform: translateY(70px);
 }

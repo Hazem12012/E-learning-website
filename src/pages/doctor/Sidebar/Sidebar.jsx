@@ -32,7 +32,7 @@ export default function Sidebar() {
           <FaArrowRight />
         </button>
       )}
-      <div className={`d-flex  position-fixed  z-3 `}>
+      <div className={`d-flex  position-fixed  z-3  sidebar_box`}>
         <div
           className={`sidebar  text-light ${isOpen ? "open" : ""}`}
           style={isOpen ? { width: "240px" } : { width: "0px" }}>

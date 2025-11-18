@@ -6,15 +6,15 @@ import "./Layout.css";
 function Layout() {
   return (
     <>
-      <Navbar />
-        <Sidebar />
-      <div className=' page_container d-block'>
+      <div className=' page_container'>
         {/* ********{ Home /  Profile / Cources }************ */}
+        <Navbar />
+        <Sidebar />
         <div className="layout_content">
           <Outlet />
         </div>
-        {/* **********{End}********** */}
       </div>
+      {/* **********{End}********** */}
     </>
   );
 }

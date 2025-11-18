@@ -1,19 +1,17 @@
 /* View Mode Styles */
 .profile-container {
-  min-height: calc(100vh - 70px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
   background: #1d2e42;
 }
 
+.profile-container_main{
+
+}
 .profile-card {
   background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   padding: 3rem;
-  max-width: 500px;
   width: 100%;
   animation: fadeIn 0.5s ease-in;
 }
@@ -133,4 +131,68 @@
 
 .card {
   animation: fadeIn 0.5s ease-in;
+}
+
+/* ************************* */
+.main-profile-card{
+/* padding: 20px  0 0 0 !important; */
+
+}
+.profile-card {
+  background: #ffffff;
+  /* padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  max-width: 850px;
+  margin: 25px auto;
+  border: 1px solid #eaeaea; */
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1f36;
+  margin-bottom: 25px !important;
+  border-bottom: 1px solid #e4e4e4;
+  padding-bottom: 30px ;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #f8f9fc;
+  padding: 17px 20px;
+  border-radius: 12px;
+  border: 1px solid #ebedf3;
+  transition: 0.3s ease;
+}
+
+.info-item:hover {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+.info-icon {
+  width: 28px;
+  height: 28px;
+  color: #4c6ef5;
+}
+
+.label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 2px;
+}
+
+.value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
 }

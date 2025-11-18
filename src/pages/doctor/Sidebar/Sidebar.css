@@ -1,15 +1,18 @@
+.sidebar_box{
+   /* height: calc(100vh - 70px); */
+   height: calc(100vh);
+   top: 70px !important;
+   position: fixed;
+}
 .sidebar {
   position: relative;
   width: 240px;
-  height: calc(100vh);
   transition: all 0.2s ease-in-out;
-
   top: 0;
   left: -240px;
   transform: translateX(-240px);
   overflow-y: auto;
   background-color: #23364d;
-  top: 69px !important;
 }
 
 .sidebar.open {
