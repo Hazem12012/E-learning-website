@@ -1,12 +1,12 @@
 import { useContext } from "react";
-import Portfolio from "../../../images/porfolio.png";
 import "./Navbar.css";
 // React Icons
 import { IoSearch } from "react-icons/io5";
-import { UserContext } from "../../services/context";
+import { UserAuth } from "../../services/AuthContext";
 
 function Navbar() {
-  const { isOpen, setIsOpen } = useContext(UserContext);
+  const { isOpen, setIsOpen } = UserAuth();
+  const demo_avatar = "https://kkidlguxawdxyygsjxmo.supabase.co/storage/v1/object/sign/avatars/demo-Image.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jMDlhYjhjNS1hYWZmLTQ0MTMtOWNmZi1mODhlMDc1NmIyMTEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhdmF0YXJzL2RlbW8tSW1hZ2UuanBnIiwiaWF0IjoxNzY0NDIxNjc3LCJleHAiOjE3NjUwMjY0Nzd9.POp0c0cBh5Sf1uXJre9poejU-0YW1YVjxUIDL5kCQtg"
 
   return (
     <nav className='navbar navbar-expand-lg  d-blok position-fixed '>
@@ -46,7 +46,7 @@ function Navbar() {
             <button className='border-0' onClick={() => setIsOpen(!isOpen)}>
               <img
                 className=' rounded-circle '
-                src={Portfolio}
+                src={demo_avatar}
                 alt='Logo'
                 width={"40px"}
               />

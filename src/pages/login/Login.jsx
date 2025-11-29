@@ -43,7 +43,7 @@ function Login() {
       await toast.success("Login successful");
       await navigate("/home");
     } else {
-      toast.error(`${result.error.message}`);
+      toast.error(`${ result.error.message }`);
     }
   };
 

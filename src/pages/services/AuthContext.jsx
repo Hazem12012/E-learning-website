@@ -7,6 +7,7 @@ export const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   //  Register new user
   const registerNewUser = async (email, password, naturalId, teacher) => {
@@ -26,8 +27,7 @@ export const AuthContextProvider = ({ children }) => {
       return { success: true, data };
     } catch (error) {
       console.error("There was a problem signing up:", error.message);
-
-      toast.error(`${error.message}`);
+      toast.error(`${ error.message }`);
       return { success: false, error };
     }
   };
@@ -52,11 +52,11 @@ export const AuthContextProvider = ({ children }) => {
 
       // ✅ Check if user role matches checkbox
       if (role !== expectedRole) {
-        throw new Error(`This account is not a ${expectedRole}.`);
+        throw new Error(`This account is not a ${ expectedRole }.`);
       }
 
       // ✅ Success
-      console.log(`✅ Logged in as ${role}:`, user.email);
+      console.log(`✅ Logged in as ${ role }:`, user.email);
       return { success: true, data, role };
     } catch (error) {
       console.error("An error occurred while signing in:", error.message);
@@ -66,12 +66,32 @@ export const AuthContextProvider = ({ children }) => {
 
   //  Sign out user
   const signOutUser = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signOut();
+      if (error) return false;
+
+      return true;
+    } catch {
       toast.error("Error signing out");
       return false;
+    } finally {
+      setLoading(false);
     }
-    return true;
+  };
+
+  // ✅ NEW: Refresh user data after profile update
+  const refreshUserData = async () => {
+    try {
+      const { data: { session: newSession }, error } = await supabase.auth.getSession();
+      if (error) throw error;
+
+      setSession(newSession);
+      return newSession;
+    } catch (error) {
+      console.error("Error refreshing user data:", error);
+      return null;
+    }
   };
 
   //  Listen to session changes
@@ -83,29 +103,48 @@ export const AuthContextProvider = ({ children }) => {
       setSession(session);
       setLoading(false);
     };
-    
+
     getSession();
 
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
+        setLoading(false);
       }
     );
-    
+
     return () => {
       listener.subscription.unsubscribe();
     };
   }, []);
-  console.log(session);
+
+  const user = session?.user || {};
+
+  const {
+    email,
+    created_at,
+    user_metadata: { naturalId, role, name, phone, avatar_url } = {}
+  } = user;
 
   return (
     <AuthContext.Provider
       value={{
         session,
         loading,
+        setLoading,
         registerNewUser,
         signInUser,
         signOutUser,
+        refreshUserData, // ✅ Add this function
+        email,
+        created_at,
+        naturalId,
+        role,
+        name,
+        phone,
+        avatar_url, // ✅ Add avatar_url
+        isOpen,
+        setIsOpen,
       }}>
       {children}
     </AuthContext.Provider>

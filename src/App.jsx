@@ -1,34 +1,36 @@
+import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { UserContext } from "./pages/services/context.jsx";
-import { useState } from "react";
+import { AuthContextProvider } from "./pages/services/AuthContext.jsx";
+import { Suspense } from "react";
 import { Toaster } from "react-hot-toast";
 import Layout from "./pages/Layout/Layout.jsx";
-import Home from "./pages/doctor/Home/Home.jsx";
-import Profile from "./pages/doctor/Profile/Profile.jsx";
-import Courses from "./pages/doctor/Cources/Courses.jsx";
 import Login_Register from "./pages/login&Register/Login_Register.jsx";
 import Notfound from "./pages/Notfound.jsx";
 import Register from "./pages/Register/Register.jsx";
 import Login from "./pages/Login/Login.jsx";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword.jsx";
 import PrivateRoute from "./pages/services/PrivateRoute.jsx";
+import Loading from "./components/Loading/Loading.jsx";
+
+// Lazy load all major components
+const Home = React.lazy(() => import("./pages/doctor/Home/Home.jsx"));
+const Profile = React.lazy(() => import("./pages/doctor/Profile/Profile.jsx"));
+const Courses = React.lazy(() => import("./pages/doctor/Cources_2/CoursesPage.jsx"));
+import CourseDetailsPage from './pages/doctor/Cources_2/CourseDetailsPage';
 
 function App() {
-  const [isOpen, setIsOpen] = useState(false);
 
   const router = createBrowserRouter([
     {
-      element: (
-        <UserContext.Provider value={{ isOpen, setIsOpen }}>
-          <Layout />
-        </UserContext.Provider>
-      ),
+      element: <Layout />,
       children: [
         {
           path: "/",
           element: (
             <PrivateRoute>
-              <Home />
+              <Suspense fallback={<Loading />}>
+                <Home />
+              </Suspense>
             </PrivateRoute>
           ),
         },
@@ -36,35 +38,46 @@ function App() {
           path: "/home",
           element: (
             <PrivateRoute>
-              <Home />
+              <Suspense fallback={<Loading />}>
+                <Home />
+              </Suspense>
             </PrivateRoute>
           ),
         },
-
         {
           path: "/profile",
-
           element: (
             <PrivateRoute>
-              <Profile />
+              <Suspense fallback={<Loading />}>
+                <Profile />
+              </Suspense>
             </PrivateRoute>
           ),
         },
-
         {
           path: "/cources",
           element: (
             <PrivateRoute>
-              <Courses />
+              <Suspense fallback={<Loading />}>
+                <Courses />
+              </Suspense>
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: "/cources/:courseId",
+          element: (
+            <PrivateRoute>
+              <Suspense fallback={<Loading />}>
+                <CourseDetailsPage />
+              </Suspense>
             </PrivateRoute>
           ),
         },
       ],
     },
-
     {
       element: <Login_Register />,
-
       children: [
         {
           element: <Register />,
@@ -74,37 +87,34 @@ function App() {
           path: "/login",
           element: <Login />,
         },
-
         {
           element: <ForgotPassword />,
           path: "/forgotpassword",
         },
       ],
     },
-
     {
       element: <Notfound />,
       path: "*",
     },
   ]);
+
   return (
-    <>
+    <AuthContextProvider>
+      <RouterProvider router={router} />
       <Toaster
+        position="top-center"
         containerStyle={{
           top: 80,
         }}
         toastOptions={{
-          className: "",
           style: {
             padding: "16px",
-            alignItems: "center",
-            zIndex: "99999999",
-            top: "40px",
+            zIndex: 99999999,
           },
         }}
       />
-      <RouterProvider router={router} />
-    </>
+    </AuthContextProvider>
   );
 }
 

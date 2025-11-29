@@ -1,10 +1,8 @@
-import React, { useContext, useState } from "react";
 import { FaHome, FaBook, FaUser, FaBars } from "react-icons/fa";
 import { HiOutlineLogout } from "react-icons/hi";
 import { IoMdArrowRoundBack } from "react-icons/io";
 
 import "./Sidebar.css";
-import { UserContext } from "../../services/context";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { UserAuth } from "../../services/AuthContext";
@@ -12,8 +10,7 @@ import toast from "react-hot-toast";
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  const { isOpen, setIsOpen } = useContext(UserContext);
-  const { signOutUser } = UserAuth();
+  const { signOutUser, isOpen, setIsOpen } = UserAuth();
 
   async function handleLogout() {
     const success = await signOutUser();
@@ -34,7 +31,7 @@ export default function Sidebar() {
       )}
       <div className={`d-flex  position-fixed  z-3  sidebar_box`}>
         <div
-          className={`sidebar  text-light ${isOpen ? "open" : ""}`}
+          className={`sidebar  text-light ${ isOpen ? "open" : "" }`}
           style={isOpen ? { width: "240px" } : { width: "0px" }}>
           <h4 className='text-center py-3 border-bottom d-flex align-items-center'>
             <span className=' '>

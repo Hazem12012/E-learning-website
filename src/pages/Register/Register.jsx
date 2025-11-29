@@ -46,7 +46,7 @@ function Register() {
     } else setPasswordError("");
 
     if (naturalId.length !== 14) {
-      setNaturalIdError(`Natural ID must be 14 digits (${naturalId.length})`);
+      setNaturalIdError(`Natural ID must be 14 digits (${ naturalId.length })`);
 
       valid = false;
     } else setNaturalIdError("");
@@ -58,12 +58,15 @@ function Register() {
     const user = result.data.user;
     const userRole = user?.user_metadata?.role;
     if (result.success) {
-      await toast.success(`Account created successfully`);
+
+      setTimeout(() => {
+        toast.success('Account created successfully');
+      }, 2000);
       console.log("Supabase user:", result.data);
       await navigate("/home");
       // console.log(result.data)
     } else {
-      toast.error(`${result.error.message}`);
+      toast.error(`${ result.error.message }`);
     }
     console.log("User logged in with role:", userRole);
 

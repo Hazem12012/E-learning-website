@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Outlet, useNavigate } from "react-router-dom";
 import { IoMdArrowRoundBack } from "react-icons/io";
-import "./Login_Register.css";
+import  "./Login_Register.css";
 
 function Login_Register() {
   const emailRef = useRef(null);
