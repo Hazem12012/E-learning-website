@@ -302,18 +302,17 @@ export default function Profile() {
                 </div>
               </div>
             </div>
+            <div className="text-center mt-3 edit-button-container">
+              <button
+                className="btn btn-primary edit-profile-btn mb-2"
+                onClick={() => setIsEditing(true)}
+              >
+                <FiEdit2 className="me-1" />
+                Edit Profile
+              </button>
+            </div>
           </div>
 
-          {/* Edit Button */}
-          <div className="text-center mt-3" style={{ flexShrink: 0 }}>
-            <button
-              className="btn btn-primary"
-              onClick={() => setIsEditing(true)}
-            >
-              <FiEdit2 className="me-1" />
-              Edit Profile
-            </button>
-          </div>
         </div>
       </div>
     );
