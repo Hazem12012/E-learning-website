@@ -325,19 +325,21 @@ export default function Profile() {
         <div className="card-body p-4">
           {/* Header with Avatar Upload */}
           <div className="text-center mb-4 pb-3 border-bottom">
-            <div className="profile-avatar mb-3 position-relative" style={{ display: 'inline-block' }}>
-              <img
-                src={avatarPreview}
-                alt="Profile"
-                className="rounded-circle"
-                style={{
-                  width: '120px',
-                  height: '120px',
-                  objectFit: 'cover',
-                  cursor: 'pointer'
-                }}
-                onClick={handleAvatarClick}
-              />
+            <div className="position-relative d-inline-block mb-4">
+              <div className="profile-avatar m-0">
+                <img
+                  src={avatarPreview}
+                  alt="Profile"
+                  className="rounded-circle"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    cursor: 'pointer'
+                  }}
+                  onClick={handleAvatarClick}
+                />
+              </div>
               <button
                 type="button"
                 className="btn btn-primary btn-sm rounded-circle position-absolute"
@@ -349,7 +351,9 @@ export default function Profile() {
                   padding: '0',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  zIndex: 10,
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                 }}
                 onClick={handleAvatarClick}
               >
