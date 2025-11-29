@@ -2,3 +2,7 @@
   height: calc(100vh - 70px);
   transform: translateY(70px);
 }
+
+.layout_content-no-scroll {
+  overflow: hidden;
+}

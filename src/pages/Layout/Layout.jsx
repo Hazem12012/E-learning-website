@@ -26,8 +26,8 @@ function Layout() {
       <div className="page_container">
         <Navbar />
         <Sidebar />
-        <div className="layout_content">
-          <Outlet />
+        <div className={`layout_content ${location.pathname.includes('/profile') ? 'layout_content-no-scroll' : ''}`}>
+        <Outlet />
         </div>
       </div>
     </>

@@ -35,7 +35,8 @@ export default function CourseDetailsPage() {
         enrollment: 842,
         category: "Math",
         description: "Master Discrete Math from basics to advanced concepts",
-        image: "https://via.placeholder.com/200x200/4a5568/ffffff?text=Course"
+        image: "https://via.placeholder.com/200x200/4a5568/ffffff?text=Course",
+        instructorImage: `https://ui-avatars.com/api/?name=${encodeURIComponent("Dr. Mostafa")}&background=49bbbd&color=fff&size=200&bold=true`
     };
 
     const toggleLesson = (index) => {
@@ -261,11 +262,6 @@ export default function CourseDetailsPage() {
                                             </p>
                                         </div>
                                     </div>
-                                    <img
-                                        src={course.image}
-                                        alt={course.instructor}
-                                        className="inst-photo"
-                                    />
                                 </div>
                             </div>
                         )}

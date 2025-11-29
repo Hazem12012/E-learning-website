@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { UserAuth } from "../../services/AuthContext";
 import { supabase } from "../../services/SupabaseClient";
 import toast from "react-hot-toast";
@@ -36,11 +36,10 @@ export default function Profile() {
     name,
     phone,
     avatar_url,
-    refreshUserData, // ✅ Get refresh function from context
+    refreshUserData, //Get refresh function from context
   } = UserAuth();
 
   const user = session?.user;
-  const userMetadata = useMemo(() => user?.user_metadata || {}, [user?.user_metadata]);
   const displayName = name || user?.email?.split("@")[0] || "User";
   const currentAvatarUrl = avatar_url || demo_avatar;
 
@@ -306,7 +305,7 @@ export default function Profile() {
           </div>
 
           {/* Edit Button */}
-          <div className="text-center mt-4">
+          <div className="text-center mt-3" style={{ flexShrink: 0 }}>
             <button
               className="btn btn-primary"
               onClick={() => setIsEditing(true)}
