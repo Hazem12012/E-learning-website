@@ -1,7 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./CourseDetailsPage.css";
+import { useParams } from "react-router-dom";
+import { UserAuth } from './../../services/AuthContext';
+import { supabase } from "../../services/SupabaseClient";
 
 export default function CourseDetailsPage() {
+    const { courseId } = useParams();
+    const [loading, setLoading] = useState();
+
+    const [course, setCourse] = useState(null);
     const [activeTab, setActiveTab] = useState("desc");
     const [openLessons, setOpenLessons] = useState({});
     const [showQuizModal, setShowQuizModal] = useState(false);
@@ -27,17 +34,85 @@ export default function CourseDetailsPage() {
 
     const [enrolledStudents, setEnrolledStudents] = useState([]);
 
-    const course = {
-        id: 1,
-        code: "MA112",
-        title: "Discrete Math",
-        instructor: "Dr. Mostafa",
-        enrollment: 842,
-        category: "Math",
-        description: "Master Discrete Math from basics to advanced concepts",
-        image: "https://via.placeholder.com/200x200/4a5568/ffffff?text=Course",
-        instructorImage: `https://ui-avatars.com/api/?name=${encodeURIComponent("Dr. Mostafa")}&background=49bbbd&color=fff&size=200&bold=true`
-    };
+    useEffect(() => {
+        const fetchCourse = async () => {
+            if (!courseId) return;
+
+            setLoading(true);
+
+            try {
+                // Fetch course
+                const { data: courseData, error: courseError } = await supabase
+                    .from("courses")
+                    .select("*")
+                    .eq("id", courseId)
+                    .single();
+
+                if (courseError) {
+                    console.error("Course error:", courseError);
+                    return;
+                }
+
+                // Fetch enrolled students count
+                const { count: studentCount, error: countError } = await supabase
+                    .from("course_students")
+                    .select("*", { count: "exact", head: true })
+                    .eq("course_id", courseId);
+
+                if (countError) {
+                    console.error("Student count error:", countError);
+                }
+
+                // Fetch enrolled students details
+                const { data: enrolled, error: studentError } = await supabase
+                    .from("course_students")
+                    .select(`
+                        student_id,
+                        profiles (
+                            name,
+                            naturalid
+                        )
+                    `)
+                    .eq("course_id", courseId);
+
+                if (!studentError && enrolled) {
+                    const mappedStudents = enrolled.map(item => ({
+                        id: item.student_id,
+                        name: item.profiles?.name || 'Unknown',
+                        studentId: item.profiles?.naturalid || 'N/A',
+                        email: `${ item.profiles?.name?.toLowerCase().replace(/\s+/g, '.') }@university.edu`,
+                        avatar: `https://ui-avatars.com/api/?name=${ encodeURIComponent(item.profiles?.name || 'Unknown') }&background=49bbbd&color=fff&size=128`
+                    }));
+                    setEnrolledStudents(mappedStudents);
+                }
+
+                // Map course data to desired structure
+                const formattedCourse = {
+                    idx: 0,
+                    id: courseData.id,
+                    code: courseData.code,
+                    title: courseData.title,
+                    instructor: courseData.instructor,
+                    students: studentCount || 0,
+                    enrollment: studentCount || 0,
+                    image: courseData.image,
+                    category: courseData.category,
+                    description: courseData.description,
+                    created_by: courseData.created_by,
+                    created_at: courseData.created_at,
+                    updated_at: courseData.updated_at,
+                };
+
+                setCourse(formattedCourse);
+            } catch (err) {
+                console.error("Unexpected error:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCourse();
+    }, [courseId]); // Removed setLoading from dependencies
 
     const toggleLesson = (index) => {
         if (activeTab !== "curriculum") return;
@@ -67,7 +142,7 @@ export default function CourseDetailsPage() {
     };
 
     const handleDeleteQuiz = (quizId, quizTitle) => {
-        if (window.confirm(`Are you sure you want to delete "${quizTitle}"?`)) {
+        if (window.confirm(`Are you sure you want to delete "${ quizTitle }"?`)) {
             setQuizzes((prev) => prev.filter((q) => q.id !== quizId));
         }
     };
@@ -91,7 +166,7 @@ export default function CourseDetailsPage() {
     };
 
     const handleDeleteLesson = (lessonId, lessonTitle) => {
-        if (window.confirm(`Are you sure you want to delete "${lessonTitle}"?`)) {
+        if (window.confirm(`Are you sure you want to delete "${ lessonTitle }"?`)) {
             setLessons((prev) => prev.filter((l) => l.id !== lessonId));
         }
     };
@@ -108,7 +183,7 @@ export default function CourseDetailsPage() {
             name: studentForm.name,
             studentId: studentForm.studentId,
             email: studentForm.email,
-            avatar: studentForm.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(studentForm.name)}&background=49bbbd&color=fff&size=128`,
+            avatar: studentForm.avatarUrl || `https://ui-avatars.com/api/?name=${ encodeURIComponent(studentForm.name) }&background=49bbbd&color=fff&size=128`,
         };
 
         setEnrolledStudents((prev) => [...prev, newStudent]);
@@ -117,10 +192,28 @@ export default function CourseDetailsPage() {
     };
 
     const handleDeleteStudent = (studentId, studentName) => {
-        if (window.confirm(`Are you sure you want to remove "${studentName}" from this course?`)) {
+        if (window.confirm(`Are you sure you want to remove "${ studentName }" from this course?`)) {
             setEnrolledStudents((prev) => prev.filter((s) => s.id !== studentId));
         }
     };
+
+    // ✅ Show loading state
+    if (loading || !course) {
+        return (
+            <div className="course-details-page">
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    minHeight: '50vh',
+                    fontSize: '1.2rem',
+                    color: '#666'
+                }}>
+                    Loading course details...
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="course-details-page">
@@ -152,7 +245,7 @@ export default function CourseDetailsPage() {
                         ].map(([id, label]) => (
                             <button
                                 key={id}
-                                className={`tab ${activeTab === id ? "active" : ""}`}
+                                className={`tab ${ activeTab === id ? "active" : "" }`}
                                 onClick={() => setActiveTab(id)}
                             >
                                 {label}
@@ -188,7 +281,7 @@ export default function CourseDetailsPage() {
                                         onClick={() => setShowLessonModal(true)}
                                     >
                                         <svg width='20' height='20' viewBox='0 0 24 24' fill='none' style={{ marginRight: '8px' }}>
-                                            <path d='M12 5V19M5 12H19' stroke='currentColor' strokeWidth='2' strokeLinecap='round'/>
+                                            <path d='M12 5V19M5 12H19' stroke='currentColor' strokeWidth='2' strokeLinecap='round' />
                                         </svg>
                                         Add Lesson
                                     </button>
@@ -201,7 +294,7 @@ export default function CourseDetailsPage() {
                                     </div>
                                 ) : (
                                     lessons.map((lesson, index) => (
-                                        <div key={lesson.id} className={`lesson ${openLessons[index] ? "open" : ""}`}>
+                                        <div key={lesson.id} className={`lesson ${ openLessons[index] ? "open" : "" }`}>
                                             <div className="lesson-header" onClick={() => toggleLesson(index)}>
                                                 <span className="lesson-title">
                                                     <i className="fas fa-book"></i> {lesson.title}
@@ -216,7 +309,7 @@ export default function CourseDetailsPage() {
                                                         style={{ padding: '6px 10px', marginRight: '10px' }}
                                                     >
                                                         <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor'>
-                                                            <path d='M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'/>
+                                                            <path d='M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' />
                                                         </svg>
                                                     </button>
                                                     <span className="arrow">▼</span>
@@ -275,7 +368,7 @@ export default function CourseDetailsPage() {
                                         onClick={() => setShowStudentModal(true)}
                                     >
                                         <svg width='20' height='20' viewBox='0 0 24 24' fill='none' style={{ marginRight: '8px' }}>
-                                            <path d='M12 5V19M5 12H19' stroke='currentColor' strokeWidth='2' strokeLinecap='round'/>
+                                            <path d='M12 5V19M5 12H19' stroke='currentColor' strokeWidth='2' strokeLinecap='round' />
                                         </svg>
                                         Add Student
                                     </button>
@@ -309,7 +402,7 @@ export default function CourseDetailsPage() {
                                                     title="Remove student"
                                                 >
                                                     <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor'>
-                                                        <path d='M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'/>
+                                                        <path d='M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' />
                                                     </svg>
                                                 </button>
                                             </div>
@@ -328,7 +421,7 @@ export default function CourseDetailsPage() {
                                         onClick={() => setShowQuizModal(true)}
                                     >
                                         <svg width='20' height='20' viewBox='0 0 24 24' fill='none' style={{ marginRight: '8px' }}>
-                                            <path d='M12 5V19M5 12H19' stroke='currentColor' strokeWidth='2' strokeLinecap='round'/>
+                                            <path d='M12 5V19M5 12H19' stroke='currentColor' strokeWidth='2' strokeLinecap='round' />
                                         </svg>
                                         Add Quiz
                                     </button>
@@ -366,7 +459,7 @@ export default function CourseDetailsPage() {
                                                         }}
                                                     >
                                                         <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor'>
-                                                            <path d='M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'/>
+                                                            <path d='M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' />
                                                         </svg>
                                                     </button>
                                                 </div>
@@ -380,6 +473,7 @@ export default function CourseDetailsPage() {
                 </div>
             </div>
 
+            {/* Modals remain the same... */}
             {showQuizModal && (
                 <div className="modal-overlay" onClick={() => setShowQuizModal(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -390,7 +484,7 @@ export default function CourseDetailsPage() {
                                 onClick={() => setShowQuizModal(false)}
                             >
                                 <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
-                                    <path d='M18 6L6 18M6 6L18 18' stroke='currentColor' strokeWidth='2' strokeLinecap='round'/>
+                                    <path d='M18 6L6 18M6 6L18 18' stroke='currentColor' strokeWidth='2' strokeLinecap='round' />
                                 </svg>
                             </button>
                         </div>
@@ -471,7 +565,7 @@ export default function CourseDetailsPage() {
                                 onClick={() => setShowLessonModal(false)}
                             >
                                 <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
-                                    <path d='M18 6L6 18M6 6L18 18' stroke='currentColor' strokeWidth='2' strokeLinecap='round'/>
+                                    <path d='M18 6L6 18M6 6L18 18' stroke='currentColor' strokeWidth='2' strokeLinecap='round' />
                                 </svg>
                             </button>
                         </div>
@@ -533,7 +627,7 @@ export default function CourseDetailsPage() {
                                 onClick={() => setShowStudentModal(false)}
                             >
                                 <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
-                                    <path d='M18 6L6 18M6 6L18 18' stroke='currentColor' strokeWidth='2' strokeLinecap='round'/>
+                                    <path d='M18 6L6 18M6 6L18 18' stroke='currentColor' strokeWidth='2' strokeLinecap='round' />
                                 </svg>
                             </button>
                         </div>

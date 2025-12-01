@@ -370,18 +370,25 @@ body {
     z-index: 9999;
     padding: 20px;
     backdrop-filter: blur(4px);
+    height: 100vmax;
 }
 
 .modal-content {
     background: white;
     border-radius: 16px;
     width: 100%;
-    max-width: 600px;
-    max-height: 90vh;
+    max-width: 550px;
+    max-height: 70vh;
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     animation: modalSlideIn 0.3s ease;
+    position: absolute;
+    top: 50px;
+    scrollbar-width: none;
+    /* margin-bottom: 70px; */
+    
 }
+
 
 @keyframes modalSlideIn {
     from {
@@ -562,7 +569,7 @@ body {
     }
 
     .modal-content {
-        max-height: 95vh;
+        max-height: 90vh;
     }
 
     .add-course-btn-container {

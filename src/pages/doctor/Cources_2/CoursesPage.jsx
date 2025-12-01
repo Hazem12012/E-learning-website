@@ -143,6 +143,12 @@ export default function CoursesPage() {
             return;
         }
 
+        // Check if user is authenticated
+        if (!session?.user?.id) {
+            toast.error("You must be logged in to create a course");
+            return;
+        }
+
         setLoading(true);
         try {
             let imageUrl = cover1;
@@ -172,7 +178,7 @@ export default function CoursesPage() {
                 category: courseCategory,
                 description: form.description ?
                     form.description.charAt(0).toUpperCase() + form.description.slice(1) : "",
-                created_by: session.user.id,
+                created_by: session.user.id, // This links the course to the user
             };
 
             const { data, error } = await supabase
@@ -206,6 +212,7 @@ export default function CoursesPage() {
         }
     };
 
+
     const closeModal = () => {
         setShowModal(false);
         setForm({
@@ -223,6 +230,27 @@ export default function CoursesPage() {
         navigate(`/cources/${ courseId }`);
     };
 
+    // const handleDeleteCourse = async (courseId, courseTitle) => {
+    //     if (!window.confirm(`Are you sure you want to delete "${ courseTitle }"?`)) {
+    //         return;
+    //     }
+
+    //     try {
+    //         const { error } = await supabase
+    //             .from('courses')
+    //             .delete()
+    //             .eq('id', courseId);
+
+    //         if (error) throw error;
+
+    //         setCourses((prev) => prev.filter((course) => course.id !== courseId));
+    //         toast.success('Course deleted successfully');
+    //     } catch (error) {
+    //         console.error('Error deleting course:', error);
+    //         toast.error('Failed to delete course');
+    //     }
+    // };
+
     const handleDeleteCourse = async (courseId, courseTitle) => {
         if (!window.confirm(`Are you sure you want to delete "${ courseTitle }"?`)) {
             return;
@@ -232,9 +260,16 @@ export default function CoursesPage() {
             const { error } = await supabase
                 .from('courses')
                 .delete()
-                .eq('id', courseId);
+                .eq('id', courseId)
+                .eq('created_by', session.user.id); // Only delete if user owns the course
 
-            if (error) throw error;
+            if (error) {
+                if (error.code === '42501') {
+                    toast.error('You can only delete your own courses');
+                    return;
+                }
+                throw error;
+            }
 
             setCourses((prev) => prev.filter((course) => course.id !== courseId));
             toast.success('Course deleted successfully');
