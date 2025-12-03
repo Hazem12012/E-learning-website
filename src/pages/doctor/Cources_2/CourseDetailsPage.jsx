@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import "./CourseDetailsPage.css";
 import { useParams } from "react-router-dom";
-import { UserAuth } from './../../services/AuthContext';
 import { supabase } from "../../services/SupabaseClient";
+import Loading from './../../../components/Loading/Loading';
+import toast from "react-hot-toast";
 
 export default function CourseDetailsPage() {
     const { courseId } = useParams();
@@ -102,7 +103,6 @@ export default function CourseDetailsPage() {
                     created_at: courseData.created_at,
                     updated_at: courseData.updated_at,
                 };
-
                 setCourse(formattedCourse);
             } catch (err) {
                 console.error("Unexpected error:", err);
@@ -113,6 +113,7 @@ export default function CourseDetailsPage() {
 
         fetchCourse();
     }, [courseId]); // Removed setLoading from dependencies
+    console.log(course)
 
     const toggleLesson = (index) => {
         if (activeTab !== "curriculum") return;
@@ -170,32 +171,179 @@ export default function CourseDetailsPage() {
             setLessons((prev) => prev.filter((l) => l.id !== lessonId));
         }
     };
+    // const handleStudentSubmit = async (e) => {
+    //     e.preventDefault();
 
-    const handleStudentSubmit = (e) => {
+    //     const naturalId = studentForm.naturalId?.trim();
+    //     if (!naturalId) {
+    //         toast.error("Please enter Natural ID");
+    //         return;
+    //     }
+
+    //     setLoading(true);
+
+    //     // 1️⃣ البحث عن الطالب في جدول profiles
+    //     const { data: profile, error: profileError } = await supabase
+    //         .from("profiles")
+    //         .select("*")
+    //         .eq("naturalid", naturalId)
+    //         .single();
+
+    //     if (profileError || !profile) {
+    //         toast.error("Student not found!");
+    //         setLoading(false);
+    //         return;
+    //     }
+
+    //     // 2️⃣ التأكد أن الطالب غير مضاف بالفعل
+    //     const exists = enrolledStudents.some((s) => s.id === profile.id);
+    //     if (exists) {
+    //         toast.error("Student already enrolled!");
+    //         setLoading(false);
+    //         return;
+    //     }
+
+    //     // 3️⃣ إضافة الطالب لجدول course_students
+    //     const { error: insertError } = await supabase
+    //         .from("course_students")
+    //         .insert({
+    //             course_id: courseId,
+    //             student_id: profile.id,
+    //         });
+
+    //     if (insertError) {
+    //         console.error(insertError);
+    //         toast.error("Error adding student!");
+    //         setLoading(false);
+    //         return;
+    //     }
+
+    //     // 4️⃣ تحديث الواجهة
+    //     const newStudent = {
+    //         id: profile.id,
+    //         name: profile.name,
+    //         studentId: profile.naturalid,
+    //         email: `${ profile.name.replace(/\s+/g, '.').toLowerCase() }@university.edu`,
+    //         avatar: `https://ui-avatars.com/api/?name=${ encodeURIComponent(profile.name) }`
+    //     };
+
+    //     setEnrolledStudents((prev) => [...prev, newStudent]);
+
+    //     // 5️⃣ تنظيف الفورم وإغلاق المودال
+    //     setStudentForm({ naturalId: "" });
+    //     setShowStudentModal(false);
+    //     setLoading(false);
+    // };
+
+    const handleStudentSubmit = async (e) => {
         e.preventDefault();
-        if (!studentForm.name || !studentForm.studentId || !studentForm.email) {
-            console.log("Please fill in all required student fields.");
+
+        const naturalId = studentForm.naturalId?.trim();
+        if (!naturalId) {
+            toast.error("Please enter Natural ID");
             return;
         }
 
-        const newStudent = {
-            id: Date.now(),
-            name: studentForm.name,
-            studentId: studentForm.studentId,
-            email: studentForm.email,
-            avatar: studentForm.avatarUrl || `https://ui-avatars.com/api/?name=${ encodeURIComponent(studentForm.name) }&background=49bbbd&color=fff&size=128`,
-        };
+        setLoading(true);
 
-        setEnrolledStudents((prev) => [...prev, newStudent]);
-        setStudentForm({ name: "", studentId: "", email: "", avatarUrl: "" });
-        setShowStudentModal(false);
-    };
+        try {
+            // 1️⃣ Search for student in profiles table (use lowercase 'naturalid')
+            const { data: profile, error: profileError } = await supabase
+                .from("profiles")
+                .select("*")
+                .eq("naturalid", naturalId)  // ✅ lowercase
+                .single();
 
-    const handleDeleteStudent = (studentId, studentName) => {
-        if (window.confirm(`Are you sure you want to remove "${ studentName }" from this course?`)) {
-            setEnrolledStudents((prev) => prev.filter((s) => s.id !== studentId));
+            if (profileError) {
+                console.error("Profile error:", profileError);
+                toast.error("Student not found!");
+                setLoading(false);
+                return;
+            }
+
+            if (!profile) {
+                toast.error("Student not found!");
+                setLoading(false);
+                return;
+            }
+
+            // 2️⃣ Check if student is already enrolled
+            const { data: existingEnrollment, error: checkError } = await supabase
+                .from("course_students")
+                .select("*")
+                .eq("course_id", courseId)
+                .eq("student_id", profile.id)
+                .single();
+
+            if (existingEnrollment) {
+                toast.error("Student already enrolled!");
+                setLoading(false);
+                return;
+            }
+
+            // 3️⃣ Add student to course_students table
+            const { data: insertData, error: insertError } = await supabase
+                .from("course_students")
+                .insert({
+                    course_id: courseId,
+                    student_id: profile.id,
+                })
+                .select();
+
+            if (insertError) {
+                console.error("Insert error:", insertError);
+                toast.error(`Error adding student: ${ insertError.message }`);
+                setLoading(false);
+                return;
+            }
+
+            // 4️⃣ Update UI
+            const newStudent = {
+                id: profile.id,
+                name: profile.name || 'Unknown',
+                studentId: profile.naturalid || 'N/A',  // ✅ lowercase
+                email: `${ (profile.name || 'student').replace(/\s+/g, '.').toLowerCase() }@university.edu`,
+                avatar: profile.avatar_url || `https://ui-avatars.com/api/?name=${ encodeURIComponent(profile.name || 'Unknown') }&background=49bbbd&color=fff&size=128`
+            };
+
+            setEnrolledStudents((prev) => [...prev, newStudent]);
+            toast.success("Student added successfully!");
+
+            // 5️⃣ Clean form and close modal
+            setStudentForm({ naturalId: "" });
+            setShowStudentModal(false);
+
+        } catch (err) {
+            console.error("Unexpected error:", err);
+            toast.error("An unexpected error occurred!");
+        } finally {
+            setLoading(false);
         }
     };
+
+
+    const handleDeleteStudent = async (studentId, studentName) => {
+        if (!window.confirm(`Remove ${ studentName } from this course?`)) return;
+
+        const { error } = await supabase
+            .from("course_students")
+            .delete()
+            .eq("course_id", courseId)
+            .eq("student_id", studentId);
+
+        if (error) {
+            console.error("Delete failed:", error);
+            toast.error("Error: " + error.message);
+            return;
+        }
+
+        setEnrolledStudents((prev) =>
+            prev.filter((student) => student.id !== studentId)
+        );
+
+        toast.success(`${ studentName } removed successfully.`);
+    };
+
 
     // ✅ Show loading state
     if (loading || !course) {
@@ -209,7 +357,7 @@ export default function CourseDetailsPage() {
                     fontSize: '1.2rem',
                     color: '#666'
                 }}>
-                    Loading course details...
+                    <Loading />
                 </div>
             </div>
         );
@@ -217,8 +365,9 @@ export default function CourseDetailsPage() {
 
     return (
         <div className="course-details-page">
-            <div className="hero-section">
+            <div className="hero-section" >
                 <div className="hero-content">
+
                     <h1>{course.code} - {course.title}</h1>
                     <p>Instructor: {course.instructor}</p>
                 </div>
@@ -257,18 +406,7 @@ export default function CourseDetailsPage() {
                         {activeTab === "desc" && (
                             <div className="tab-section">
                                 <h3>About This Course</h3>
-                                <p>{course.description}</p>
-
-                                <h3>Learning Outcomes</h3>
-                                <ul>
-                                    <li>Understand core concepts and principles</li>
-                                    <li>Apply theoretical knowledge to practical problems</li>
-                                    <li>Develop critical thinking and analytical skills</li>
-                                    <li>Master fundamental techniques and methodologies</li>
-                                </ul>
-
-                                <h3>Prerequisites</h3>
-                                <p>Basic understanding of the subject area is recommended.</p>
+                                <p>{course.description || "With out Discription"}</p>
                             </div>
                         )}
 
@@ -634,70 +772,21 @@ export default function CourseDetailsPage() {
 
                         <form onSubmit={handleStudentSubmit} className="modal-form">
                             <div className="form-group-part">
-                                <label htmlFor="student-name">Student Name *</label>
+                                <label htmlFor="natural-id">Student Normal ID *</label>
                                 <input
-                                    id="student-name"
-                                    name="name"
-                                    value={studentForm.name}
+                                    id="natural-id"
+                                    name="naturalId"
+                                    value={studentForm.naturalId}
                                     onChange={(e) =>
-                                        setStudentForm({ ...studentForm, name: e.target.value })
+                                        setStudentForm({ ...studentForm, naturalId: e.target.value })
                                     }
-                                    placeholder="e.g. John Smith"
+                                    placeholder="(14) Number 123..."
                                     required
                                 />
                             </div>
 
-                            <div className="form-row">
-                                <div className="form-group-part">
-                                    <label htmlFor="student-id">Student ID *</label>
-                                    <input
-                                        id="student-id"
-                                        name="studentId"
-                                        value={studentForm.studentId}
-                                        onChange={(e) =>
-                                            setStudentForm({ ...studentForm, studentId: e.target.value })
-                                        }
-                                        placeholder="e.g. 20210001"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="form-group-part">
-                                    <label htmlFor="student-email">Email *</label>
-                                    <input
-                                        id="student-email"
-                                        name="email"
-                                        type="email"
-                                        value={studentForm.email}
-                                        onChange={(e) =>
-                                            setStudentForm({ ...studentForm, email: e.target.value })
-                                        }
-                                        placeholder="e.g. john.smith@university.edu"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-group-part">
-                                <label htmlFor="student-avatar">Avatar URL (optional)</label>
-                                <input
-                                    id="student-avatar"
-                                    name="avatarUrl"
-                                    type="url"
-                                    value={studentForm.avatarUrl}
-                                    onChange={(e) =>
-                                        setStudentForm({ ...studentForm, avatarUrl: e.target.value })
-                                    }
-                                    placeholder="https://example.com/avatar.jpg (auto-generated if empty)"
-                                />
-                            </div>
-
                             <div className="modal-actions">
-                                <button
-                                    type="button"
-                                    className="btn-cancel"
-                                    onClick={() => setShowStudentModal(false)}
-                                >
+                                <button type="button" className="btn-cancel" onClick={() => setShowStudentModal(false)}>
                                     Cancel
                                 </button>
                                 <button type="submit" className="btn-submit">
@@ -705,6 +794,7 @@ export default function CourseDetailsPage() {
                                 </button>
                             </div>
                         </form>
+
                     </div>
                 </div>
             )}

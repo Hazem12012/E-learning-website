@@ -15,6 +15,7 @@ body {
 
 .hero-section {
     background: #23364d;
+    backdrop-filter: blur(3px);
     padding: 60px 20px;
     text-align: center;
     color: white;
@@ -483,8 +484,10 @@ body {
 }
 
 .modal-content {
-    background: white;
-    border-radius: 16px;
+    background: white !important;
+
+    border-radius: 16px !important;
+    padding: 19px;
     width: 100%;
     max-width: 550px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -580,8 +583,8 @@ body {
     gap: 12px;
     justify-content: flex-end;
     margin-top: 12px;
-    padding-top: 20px;
-    border-top: 2px solid #e9ecef;
+    /* padding-top: 20px; */
+    /* border-top: 2px solid #e9ecef; */
 }
 
 .btn-cancel,

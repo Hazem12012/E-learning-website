@@ -1,6 +1,8 @@
 .sidebar_box{
    /* height: calc(100vh - 70px); */
    height: calc(100vh);
+   width: 100%;
+   background-color: transparent;
    top: 70px !important;
    position: fixed;
 }

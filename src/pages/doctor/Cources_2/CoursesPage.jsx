@@ -252,9 +252,9 @@ export default function CoursesPage() {
     // };
 
     const handleDeleteCourse = async (courseId, courseTitle) => {
-        if (!window.confirm(`Are you sure you want to delete "${ courseTitle }"?`)) {
-            return;
-        }
+        // if (!window.confirm(`Are you sure you want to delete "${ courseTitle }"?`)) {
+        //     return;
+        // }
 
         try {
             const { error } = await supabase
