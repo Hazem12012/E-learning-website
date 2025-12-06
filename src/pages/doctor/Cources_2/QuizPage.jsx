@@ -17,6 +17,7 @@ export default function QuizPage() {
   const [submitted, setSubmitted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(null);
   const [timerExpired, setTimerExpired] = useState(false);
+  const [submittedAnswers, setSubmittedAnswers] = useState(null);
 
   // Fetch quizzes for this course
   useEffect(() => {
@@ -108,13 +109,15 @@ export default function QuizPage() {
 
           if (existingSubmission) {
             setSubmitted(true);
+            setSubmittedAnswers(existingSubmission);
             toast.info("You have already submitted this quiz.");
           } else {
             setSubmitted(false);
+            setSubmittedAnswers(null);
           }
         }
       } catch (err) {
-        toast.error("Failed to load questions");
+        submitted && toast.error("Failed to load questions");
       } finally {
         setLoading(false);
       }
@@ -122,6 +125,29 @@ export default function QuizPage() {
 
     fetchQuestions();
   }, [selectedQuizId, user?.id, quizzes]);
+
+  // Fetch submitted answers when quiz is submitted
+  useEffect(() => {
+    const fetchSubmittedAnswers = async () => {
+      if (submitted && selectedQuizId && user?.id) {
+        try {
+          const { data, error } = await supabase
+            .from("quiz_answers")
+            .select("*")
+            .eq("quiz_id", selectedQuizId)
+            .eq("student_id", user.id)
+            .single();
+
+          if (error) throw error;
+          setSubmittedAnswers(data);
+        } catch (error) {
+          console.error("Error fetching submitted answers:", error);
+        }
+      }
+    };
+
+    fetchSubmittedAnswers();
+  }, [submitted, selectedQuizId, user?.id]);
 
   // Timer countdown effect
   useEffect(() => {
@@ -199,6 +225,7 @@ export default function QuizPage() {
       if (existing) {
         toast.error("You have already submitted this quiz!");
         setSubmitted(true);
+        setSubmittedAnswers(existing);
         setLoading(false);
         return;
       }
@@ -217,7 +244,7 @@ export default function QuizPage() {
         selected_answer: answers[questionId],
       }));
 
-      const { error: insertError } = await supabase
+      const { data: insertedData, error: insertError } = await supabase
         .from("quiz_answers")
         .insert([
           {
@@ -227,11 +254,14 @@ export default function QuizPage() {
             score: finalScore,
             submitted_at: new Date().toISOString(),
           },
-        ]);
+        ])
+        .select()
+        .single();
 
       if (insertError) throw insertError;
 
       setSubmitted(true);
+      setSubmittedAnswers(insertedData);
       setTimeRemaining(null);
       toast.success(`Quiz submitted! Score: ${finalScore}/${questions.length}`);
     } catch (err) {
@@ -311,10 +341,62 @@ export default function QuizPage() {
         <div className='alert alert-success' role='alert'>
           <h4 className='alert-heading'>Success!</h4>
           <p>You have submitted this quiz. Thank you!</p>
+          {submittedAnswers && (
+            <div className='mt-3'>
+              <h5>
+                Your Score: {submittedAnswers.score} / {questions.length}
+              </h5>
+              <p className='text-muted'>
+                Submitted at:{" "}
+                {new Date(submittedAnswers.submitted_at).toLocaleString()}
+              </p>
+            </div>
+          )}
         </div>
+
+        {/* Show correct answers */}
+        {submittedAnswers && questions.length > 0 && (
+          <div className='mt-4'>
+            <h4>Review Your Answers</h4>
+            {questions.map((q, idx) => {
+              const userAnswer = submittedAnswers.answers.find(
+                (a) => a.question_id === q.id
+              );
+              const isCorrect = userAnswer?.selected_answer === q.answer;
+
+              return (
+                <div
+                  key={q.id}
+                  className={`card p-3 mb-3 ${
+                    isCorrect ? "border-success" : "border-danger"
+                  }`}>
+                  <h5 className='mb-3'>
+                    <span className='badge bg-primary me-2'>{idx + 1}</span>
+                    {q.question}
+                    {isCorrect ? (
+                      <span className='badge bg-success ms-2'>✓ Correct</span>
+                    ) : (
+                      <span className='badge bg-danger ms-2'>✗ Wrong</span>
+                    )}
+                  </h5>
+                  <div className='mb-2'>
+                    <strong>Your answer:</strong>{" "}
+                    {userAnswer?.selected_answer || "Not answered"}
+                  </div>
+                  {!isCorrect && (
+                    <div className='text-success'>
+                      <strong>Correct answer:</strong> {q.answer}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         {quizzes.length > 1 && (
           <button
-            className='btn btn-secondary'
+            className='btn btn-secondary mt-3'
             onClick={() => {
               setSelectedQuizId(null);
               setSubmitted(false);
@@ -322,6 +404,7 @@ export default function QuizPage() {
               setAnswers({});
               setTimeRemaining(null);
               setTimerExpired(false);
+              setSubmittedAnswers(null);
             }}>
             Back to Quizzes
           </button>
