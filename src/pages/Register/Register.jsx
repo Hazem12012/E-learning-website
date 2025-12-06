@@ -62,15 +62,15 @@ function Register() {
       setTimeout(() => {
         toast.success('Account created successfully');
       }, 2000);
-      console.log("Supabase user:", result.data);
+      // console.log("Supabase user:", result.data);
       await navigate("/home");
       // console.log(result.data)
     } else {
       toast.error(`${ result.error.message }`);
     }
-    console.log("User logged in with role:", userRole);
+    // console.log("User logged in with role:", userRole);
 
-    console.log("User logged in with role:", result);
+    // console.log("User logged in with role:", result);
 
   };
 

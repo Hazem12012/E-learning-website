@@ -8,21 +8,17 @@ import { UserAuth } from "../services/AuthContext.jsx";
 
 function Layout() {
   const location = useLocation();
-  const { loading, setLoading, session } = UserAuth();
+  // const { loading, setLoading, session } = UserAuth();
 
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, [location.pathname]);
+  // useEffect(() => {
+  //   setLoading(true);
+  //   const timer = setTimeout(() => setLoading(false), 1000);
+  //   return () => clearTimeout(timer);
+  // }, [location.pathname]);
 
   return (
     <>
-      {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
-          <Loading />
-        </div>
-      )}
+
       <div className="page_container">
         <Navbar />
         <Sidebar />

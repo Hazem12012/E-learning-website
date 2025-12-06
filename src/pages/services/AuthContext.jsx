@@ -56,7 +56,7 @@ export const AuthContextProvider = ({ children }) => {
       }
 
       // ✅ Success
-      console.log(`✅ Logged in as ${ role }:`, user.email);
+      // console.log(`✅ Logged in as ${ role }:`, user.email);
       return { success: true, data, role };
     } catch (error) {
       console.error("An error occurred while signing in:", error.message);
@@ -131,6 +131,8 @@ export const AuthContextProvider = ({ children }) => {
       value={{
         session,
         loading,
+        userId: user?.id,
+        user,
         setLoading,
         registerNewUser,
         signInUser,

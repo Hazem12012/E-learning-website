@@ -6,11 +6,11 @@ import Loading from "../../components/Loading/Loading.jsx";
 const PrivateRoute = ({ children, roles }) => {
   const { session, loading } = UserAuth();
 
-  console.log("🔍 PrivateRoute Check:", {
-    loading,
-    hasSession: !!session,
-    session
-  });
+  // console.log("🔍 PrivateRoute Check:", {
+  //   loading,
+  //   hasSession: !!session,
+  //   session
+  // });
 
   if (loading) {
     return;
