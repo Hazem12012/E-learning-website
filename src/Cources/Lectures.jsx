@@ -147,7 +147,7 @@ function Lectures({
                 <p>
                   <strong>Video URL :</strong>
                   {"    "}
-                  <a href={lesson.video_url}>
+                  <a href={lesson.video_url} target="_blanck">
                     {lesson.video_url || "No video"}
                   </a>
                 </p>

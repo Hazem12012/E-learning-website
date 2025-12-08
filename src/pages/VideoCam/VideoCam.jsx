@@ -3,12 +3,14 @@ import * as faceapi from "face-api.js";
 import styles from "./VideoCam.module.css";
 import videoCover from "../../assets/Webcam cover.webp";
 import toast from "react-hot-toast";
+import { UserAuth } from "../services/AuthContext";
 
 export default function VideoCam({ sendData, detectCheck }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const detectIntervalRef = useRef(null);
   const photoTakenRef = useRef(false);
+  const {naturalId} = UserAuth();
 
   const [message, setMessage] = useState(null);
   const [modelsLoaded, setModelsLoaded] = useState(false);
@@ -30,8 +32,8 @@ export default function VideoCam({ sendData, detectCheck }) {
 
       const formData = new FormData();
       formData.append("image", blob, "face.jpg");
-      formData.append("national_id", "fewfewfwefddffffffd");
-      formData.append("course_id", "dsfwfewf");
+      formData.append("national_id", naturalId);
+      formData.append("course_id", "");
 
       const response = await fetch(
         "https://dd9577c74756.ngrok-free.app/verify",
