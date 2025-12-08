@@ -358,7 +358,7 @@ body {
 }
 
 .modal-overlay {
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     right: 0;
@@ -370,7 +370,7 @@ body {
     z-index: 9999;
     padding: 20px;
     backdrop-filter: blur(4px);
-    height: 100vmax;
+    height: calc(100vh  - 70px);
 }
 
 .modal-content {

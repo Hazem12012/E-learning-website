@@ -18,64 +18,6 @@ export default function VideoCam({ sendData, detectCheck }) {
   const [detectionQuality, setDetectionQuality] = useState(null);
   const [cameraStarted, setCameraStarted] = useState(false);
 
-  // const handleSubmitAttendance = async () => {
-  //   // try {
-  //   //   if (!image) {
-  //   //     console.error("No image captured");
-  //   //     return;
-  //   //   }
-
-  //   //   const blob = await (await fetch(image)).blob();
-
-  //   //   const formData = new FormData();
-  //   //   formData.append("image", blob, "image.jpg");
-  //   //   formData.append("student_id", "fiewgfuwe5d666ct"); // غيّرها حسب اسم الحقل المطلوب في الـ API
-
-  //   //   const response = await fetch("http://localhost:8000/verify", {
-  //   //     method: "POST",
-  //   //     body: formData,
-  //   //   });
-
-  //   //   const result = await response.json();
-  //   //   console.log(result);
-  //   // } catch (error) {
-  //   //   console.error("Upload failed:", error);
-  //   // }
-
-  //     try {
-  //       if (!image) {
-  //         alert("No image captured");
-  //         return;
-  //       }
-
-  //       // Convert Base64 (from canvas) to Blob
-  //       const blob = await (await fetch(image)).blob();
-
-  //       const formData = new FormData();
-  //       formData.append("image", blob, "face.jpg");
-  //       formData.append("national_id", "dnvkhdsjh"); // ⚠️ لازم نفس اسم الحقل في FastAPI
-
-  //       const response = await fetch("http://localhost:8000/verify", {
-  //         method: "POST",
-  //         body: formData, // no headers!
-  //       });
-
-  //       const result = await response.json();
-  //       console.log(result);
-  //     } catch (err) {
-  //       console.error("Verify Error:", err);
-  //     }
-  // };
-
-  // console.log("State:", {
-  //   modelsLoaded,
-  //   faceDetected,
-  //   image,
-  //   countdown,
-  //   detectionQuality,
-  // });
-
-  // Notify parent about face detection status
   const handleSubmitAttendance = async () => {
     try {
       if (!image) {
@@ -88,11 +30,16 @@ export default function VideoCam({ sendData, detectCheck }) {
 
       const formData = new FormData();
       formData.append("image", blob, "face.jpg");
-      formData.append("national_id", "12345678901234");
-      const response = await fetch("http://localhost:8000/verify", {
-        method: "POST",
-        body: formData,
-      });
+      formData.append("national_id", "fewfewfwefddffffffd");
+      formData.append("course_id", "dsfwfewf");
+
+      const response = await fetch(
+        "https://dd9577c74756.ngrok-free.app/verify",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const result = await response.json();
       console.log(result);
@@ -100,7 +47,8 @@ export default function VideoCam({ sendData, detectCheck }) {
       if (result.status === "verified" || result.status === "registered") {
         toast.success(`Success: ${result.message}`);
       } else {
-        toast.error(`Notice: ${result.message}`);
+        toast.error(`Notice: This face is already registered`);
+        console.log(result.message);
       }
     } catch (err) {
       console.error("Verify Error:", err);
