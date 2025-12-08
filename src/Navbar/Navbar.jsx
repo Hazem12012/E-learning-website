@@ -1,16 +1,24 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import "./Navbar.css";
-import Logo from "../../../assets/Logo.png";
+import Logo from "../assets/Logo.png";
 // React Icons
 import { IoSearch } from "react-icons/io5";
-import { UserAuth } from "../../services/AuthContext";
-import { Link } from "react-router-dom";
+import { UserAuth } from "../pages/services/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
-  const { isOpen, setIsOpen } = UserAuth();
+  const { isOpen, setIsOpen, searchTerm, setSearchTerm } = UserAuth();
+  const { avatar_url } = UserAuth();
+  const navigate = useNavigate();
+
   const demo_avatar =
     "https://kkidlguxawdxyygsjxmo.supabase.co/storage/v1/object/sign/avatars/demo-Image.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jMDlhYjhjNS1hYWZmLTQ0MTMtOWNmZi1mODhlMDc1NmIyMTEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhdmF0YXJzL2RlbW8tSW1hZ2UuanBnIiwiaWF0IjoxNzY0NDIxNjc3LCJleHAiOjE3NjUwMjY0Nzd9.POp0c0cBh5Sf1uXJre9poejU-0YW1YVjxUIDL5kCQtg";
-  const { avatar_url } = UserAuth();
+
+
+  function handleSearch() {
+    navigate("/cources");
+  }
+
   return (
     <nav className='navbar navbar-expand-lg  d-blok position-fixed '>
       <div className=' container d-flex  align-items-center  justify-content-between '>
@@ -40,8 +48,12 @@ function Navbar() {
               type='search'
               placeholder='Search'
               aria-label='Search'
+              // value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <span className='search_icon btn-pointer text-light  d-flex  align-items-center   justify-content-between'>
+            <span
+              className='search_icon btn-pointer text-light  d-flex  align-items-center   justify-content-between'
+              onClick={handleSearch}>
               <IoSearch className='fs-4' />
             </span>
           </form>

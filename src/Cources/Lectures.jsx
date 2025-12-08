@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
 import toast from "react-hot-toast";
-import { supabase } from "../../services/SupabaseClient";
+import { supabase } from "../pages/services/SupabaseClient";
 import { useParams } from "react-router-dom";
 import { ClipboardPenLine } from "lucide-react";
+import { UserAuth } from "../pages/services/AuthContext";
 
 function Lectures({
   //   courseId,
@@ -13,11 +14,10 @@ function Lectures({
   toggleLesson,
 }) {
   const { courseId } = useParams();
-  // ================================
-  // 1️⃣ FETCH LECTURES
-  // ================================
+  const { role } = UserAuth();
+
   const fetchLectures = async () => {
-    console.log("Fetching lectures for courseId:", courseId);
+    // console.log("Fetching lectures for courseId:", courseId);
 
     if (!courseId) {
       console.warn("⛔ No courseId provided!");
@@ -37,18 +37,15 @@ function Lectures({
       return;
     }
 
-    console.log("LECTURES FETCHED:", data);
+    // console.log("LECTURES FETCHED:", data);
     setLessons(data);
-    console.log(data);
+    // console.log(data);
   };
 
   useEffect(() => {
     if (courseId) fetchLectures();
   }, [courseId]);
 
-  // ================================
-  // 2️⃣ DELETE LECTURE
-  // ================================
   const handleDeleteLesson = async (lessonId, lessonTitle) => {
     if (!window.confirm(`Delete "${lessonTitle}"?`)) return;
 
@@ -71,24 +68,26 @@ function Lectures({
     <div className='tab-section'>
       <div className='quizzes-header'>
         <h3>Course Lectures</h3>
-        <button
-          className='add-quiz-btn'
-          onClick={() => setShowLessonModal(true)}>
-          <svg
-            width='20'
-            height='20'
-            viewBox='0 0 24 24'
-            fill='none'
-            style={{ marginRight: "8px" }}>
-            <path
-              d='M12 5V19M5 12H19'
-              stroke='currentColor'
-              strokeWidth='2'
-              strokeLinecap='round'
-            />
-          </svg>
-          Add Lecture
-        </button>
+        {role === "teacher" && (
+          <button
+            className='add-quiz-btn'
+            onClick={() => setShowLessonModal(true)}>
+            <svg
+              width='20'
+              height='20'
+              viewBox='0 0 24 24'
+              fill='none'
+              style={{ marginRight: "8px" }}>
+              <path
+                d='M12 5V19M5 12H19'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+              />
+            </svg>
+            Add Lecture
+          </button>
+        )}
       </div>
 
       {lessons.length === 0 ? (
@@ -111,27 +110,29 @@ function Lectures({
 
               <div
                 style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                <button
-                  className='quiz-delete-btn'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteLesson(lesson.id, lesson.title);
-                  }}
-                  style={{ padding: "6px 10px", marginRight: "10px" }}>
-                  <svg
-                    width='16'
-                    height='16'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'>
-                    <path
-                      d='M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6'
-                      strokeWidth='2'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                    />
-                  </svg>
-                </button>
+                {role === "teacher" && (
+                  <button
+                    className='quiz-delete-btn'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteLesson(lesson.id, lesson.title);
+                    }}
+                    style={{ padding: "6px 10px", marginRight: "10px" }}>
+                    <svg
+                      width='16'
+                      height='16'
+                      viewBox='0 0 24 24'
+                      fill='none'
+                      stroke='currentColor'>
+                      <path
+                        d='M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6'
+                        strokeWidth='2'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                      />
+                    </svg>
+                  </button>
+                )}
 
                 <span className='arrow'>▼</span>
               </div>

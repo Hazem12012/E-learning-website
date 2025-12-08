@@ -5,7 +5,7 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import "./Sidebar.css";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
-import { UserAuth } from "../../services/AuthContext";
+import { UserAuth } from "../pages/services/AuthContext";
 import toast from "react-hot-toast";
 
 export default function Sidebar() {

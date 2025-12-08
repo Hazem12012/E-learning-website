@@ -1,6 +1,8 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import * as faceapi from "face-api.js";
 import styles from "./VideoCam.module.css";
+import videoCover from "../../assets/Webcam cover.webp";
+import toast from "react-hot-toast";
 
 export default function VideoCam({ sendData, detectCheck }) {
   const videoRef = useRef(null);
@@ -14,16 +16,98 @@ export default function VideoCam({ sendData, detectCheck }) {
   const [image, setImage] = useState(null);
   const [countdown, setCountdown] = useState(null);
   const [detectionQuality, setDetectionQuality] = useState(null);
+  const [cameraStarted, setCameraStarted] = useState(false);
 
-  console.log("State:", {
-    modelsLoaded,
-    faceDetected,
-    image,
-    countdown,
-    detectionQuality,
-  });
+  // const handleSubmitAttendance = async () => {
+  //   // try {
+  //   //   if (!image) {
+  //   //     console.error("No image captured");
+  //   //     return;
+  //   //   }
+
+  //   //   const blob = await (await fetch(image)).blob();
+
+  //   //   const formData = new FormData();
+  //   //   formData.append("image", blob, "image.jpg");
+  //   //   formData.append("student_id", "fiewgfuwe5d666ct"); // غيّرها حسب اسم الحقل المطلوب في الـ API
+
+  //   //   const response = await fetch("http://localhost:8000/verify", {
+  //   //     method: "POST",
+  //   //     body: formData,
+  //   //   });
+
+  //   //   const result = await response.json();
+  //   //   console.log(result);
+  //   // } catch (error) {
+  //   //   console.error("Upload failed:", error);
+  //   // }
+
+  //     try {
+  //       if (!image) {
+  //         alert("No image captured");
+  //         return;
+  //       }
+
+  //       // Convert Base64 (from canvas) to Blob
+  //       const blob = await (await fetch(image)).blob();
+
+  //       const formData = new FormData();
+  //       formData.append("image", blob, "face.jpg");
+  //       formData.append("national_id", "dnvkhdsjh"); // ⚠️ لازم نفس اسم الحقل في FastAPI
+
+  //       const response = await fetch("http://localhost:8000/verify", {
+  //         method: "POST",
+  //         body: formData, // no headers!
+  //       });
+
+  //       const result = await response.json();
+  //       console.log(result);
+  //     } catch (err) {
+  //       console.error("Verify Error:", err);
+  //     }
+  // };
+
+  // console.log("State:", {
+  //   modelsLoaded,
+  //   faceDetected,
+  //   image,
+  //   countdown,
+  //   detectionQuality,
+  // });
 
   // Notify parent about face detection status
+  const handleSubmitAttendance = async () => {
+    try {
+      if (!image) {
+        alert("No image captured");
+        return;
+      }
+
+      // تحويل Base64 إلى Blob
+      const blob = await (await fetch(image)).blob();
+
+      const formData = new FormData();
+      formData.append("image", blob, "face.jpg");
+      formData.append("national_id", "12345678901234");
+      const response = await fetch("http://localhost:8000/verify", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      console.log(result);
+
+      if (result.status === "verified" || result.status === "registered") {
+        toast.success(`Success: ${result.message}`);
+      } else {
+        toast.error(`Notice: ${result.message}`);
+      }
+    } catch (err) {
+      console.error("Verify Error:", err);
+      toast.error("Upload failed. Check console for details.");
+    }
+  };
+
   useEffect(() => {
     if (detectCheck) {
       detectCheck(faceDetected);
@@ -33,7 +117,7 @@ export default function VideoCam({ sendData, detectCheck }) {
   // Load Face-API Models
   const loadModels = useCallback(async () => {
     try {
-      console.log("Loading models...");
+      // console.log("Loading models...");
 
       // Try local models first, fallback to CDN
       const MODEL_URL = "/models";
@@ -45,15 +129,15 @@ export default function VideoCam({ sendData, detectCheck }) {
           faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
           faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
         ]);
-        console.log("Models loaded from local folder!");
+        // console.log("Models loaded from local folder!");
       } catch (localError) {
-        console.log("Local models not found, trying CDN...");
+        // console.log("Local models not found, trying CDN...");
         await Promise.all([
           faceapi.nets.tinyFaceDetector.loadFromUri(CDN_URL),
           faceapi.nets.faceLandmark68Net.loadFromUri(CDN_URL),
           faceapi.nets.faceExpressionNet.loadFromUri(CDN_URL),
         ]);
-        console.log("Models loaded from CDN!");
+        // console.log("Models loaded from CDN!");
       }
 
       setModelsLoaded(true);
@@ -69,7 +153,7 @@ export default function VideoCam({ sendData, detectCheck }) {
   // Start Webcam
   const startVideo = useCallback(async () => {
     try {
-      console.log("Starting video...");
+      // console.log("Starting video...");
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "user",
@@ -80,7 +164,7 @@ export default function VideoCam({ sendData, detectCheck }) {
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        console.log("Video stream set");
+        // console.log("Video stream set");
       }
     } catch (err) {
       console.error("Error accessing webcam:", err);
@@ -104,7 +188,7 @@ export default function VideoCam({ sendData, detectCheck }) {
       clearInterval(detectIntervalRef.current);
     }
 
-    console.log("Starting face detection...");
+    // console.log("Starting face detection...");
 
     detectIntervalRef.current = setInterval(async () => {
       if (!videoRef.current || !canvasRef.current || photoTakenRef.current) {
@@ -187,7 +271,7 @@ export default function VideoCam({ sendData, detectCheck }) {
     const video = videoRef.current;
     if (!video || video.videoWidth === 0) return;
 
-    console.log("Taking photo...");
+    // console.log("Taking photo...");
 
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
@@ -200,7 +284,7 @@ export default function VideoCam({ sendData, detectCheck }) {
     setImage(imageUrl);
     photoTakenRef.current = true;
 
-    console.log("Photo taken!");
+    // console.log("Photo taken!");
 
     if (sendData) {
       sendData(imageUrl);
@@ -211,7 +295,7 @@ export default function VideoCam({ sendData, detectCheck }) {
 
   // Stop video
   const stopVideo = useCallback(() => {
-    console.log("Stopping video...");
+    // console.log("Stopping video...");
 
     if (detectIntervalRef.current) {
       clearInterval(detectIntervalRef.current);
@@ -227,22 +311,16 @@ export default function VideoCam({ sendData, detectCheck }) {
 
   // Initialize
   useEffect(() => {
-    let mounted = true;
-
-    const initialize = async () => {
-      if (mounted) {
-        await loadModels();
-        await startVideo();
-      }
-    };
-
-    initialize();
-
-    return () => {
-      mounted = false;
+    if (cameraStarted) {
+      loadModels().then(() => {
+        startVideo();
+      });
+    } else {
       stopVideo();
-    };
-  }, []);
+    }
+
+    return () => stopVideo();
+  }, [cameraStarted]);
 
   // Start detection when models are loaded
   useEffect(() => {
@@ -288,7 +366,7 @@ export default function VideoCam({ sendData, detectCheck }) {
 
   // Retake photo
   const retakePhoto = () => {
-    console.log("Retaking photo...");
+    // console.log("Retaking photo...");
     photoTakenRef.current = false;
     setImage(null);
     setCountdown(null);
@@ -301,15 +379,15 @@ export default function VideoCam({ sendData, detectCheck }) {
     });
   };
 
-  // Submit photo
-  const handleSubmit = () => {
-    console.log("Submitting photo...");
-    if (sendData && image) {
-      sendData(image);
-    }
-    // You can add additional logic here like showing success message
-    alert("Photo submitted successfully!");
-  };
+  // // Submit photo
+  // const handleSubmit = () => {
+  //   // console.log("Submitting photo...");
+  //   if (sendData && image) {
+  //     sendData(image);
+  //   }
+  //   // You can add additional logic here like showing success message
+  //   alert("Photo submitted successfully!");
+  // };
 
   // Error state
   if (message && message.type === "error") {
@@ -343,22 +421,49 @@ export default function VideoCam({ sendData, detectCheck }) {
 
   return (
     <div className={styles.appvideo}>
-      {!modelsLoaded && (
+      {!modelsLoaded && cameraStarted && (
         <div
           style={{
             padding: "40px",
             textAlign: "center",
             fontSize: "18px",
+            zIndex: "9999",
           }}>
           Loading face detection models...
         </div>
       )}
 
-      {!image && modelsLoaded && (
+      {!cameraStarted && (
+        <button
+          className=''
+          onClick={() => setCameraStarted(true)}
+          style={{
+            width: "100%",
+            maxWidth: "640px",
+            height: "420px",
+            background: "#000",
+            color: "#fff",
+            fontSize: "28px",
+            borderRadius: "12px",
+            border: "2px solid #444",
+            cursor: "pointer",
+          }}>
+          <div className='d-flex align-items-center justify-content-center flex-column'>
+            <img
+              src={videoCover}
+              className='img-fluid rounded-top w-auto mb-4'
+              alt=''
+            />
+            <span className=' position-relative'>Start Camera</span>
+          </div>
+        </button>
+      )}
+
+      {cameraStarted && !image && modelsLoaded && (
         <div className={styles.videoContainer}>
           <video
             ref={videoRef}
-            poster="ehfsgiu"
+            // poster={videoCover}
             className={styles.video}
             autoPlay
             muted
@@ -381,59 +486,6 @@ export default function VideoCam({ sendData, detectCheck }) {
               borderRadius: "12px",
             }}
           />
-
-          {/* Status overlay */}
-          {/* <div
-            style={{
-              position: "absolute",
-              top: "20px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              zIndex: 10,
-              textAlign: "center",
-            }}>
-            {detectionQuality && (
-              <div
-                style={{
-                  padding: "12px 24px",
-                  borderRadius: "25px",
-                  fontWeight: "600",
-                  fontSize: "16px",
-                  background: faceDetected
-                    ? "rgba(34, 197, 94, 0.9)"
-                    : "rgba(234, 179, 8, 0.9)",
-                  color: "white",
-                  marginBottom: "20px",
-                }}>
-                {detectionQuality}
-              </div>
-            )}
-
-            {countdown !== null && (
-              <div
-                style={{
-                  animation: "pulse 1s ease-in-out infinite",
-                }}>
-                <div
-                  style={{
-                    fontSize: "80px",
-                    fontWeight: "bold",
-                    color: "white",
-                    textShadow: "0 4px 12px rgba(0, 0, 0, 0.5)",
-                  }}>
-                  {countdown}
-                </div>
-                <div
-                  style={{
-                    fontSize: "18px",
-                    color: "white",
-                    textShadow: "0 2px 8px rgba(0, 0, 0, 0.5)",
-                  }}>
-                  Get ready...
-                </div>
-              </div>
-            )}
-          </div> */}
 
           <div className={styles.statusOverlay}>
             {detectionQuality && (
@@ -458,6 +510,7 @@ export default function VideoCam({ sendData, detectCheck }) {
       {image && (
         <div style={{ textAlign: "center" }}>
           <img
+            className={styles.capturedImage}
             src={image}
             alt='Captured'
             style={{
@@ -467,7 +520,7 @@ export default function VideoCam({ sendData, detectCheck }) {
               marginBottom: "20px",
             }}
           />
-          <div className="d-flex align-items-center justify-content-center gap-2">
+          <div className='d-flex align-items-center justify-content-center gap-2'>
             <button
               onClick={retakePhoto}
               style={{
@@ -484,6 +537,7 @@ export default function VideoCam({ sendData, detectCheck }) {
             </button>
 
             <button
+              onClick={handleSubmitAttendance}
               style={{
                 padding: "12px 30px",
                 fontSize: "16px",

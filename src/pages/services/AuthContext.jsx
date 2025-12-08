@@ -8,7 +8,29 @@ export const AuthContextProvider = ({ children }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [courses, setCourses] = useState([]);
 
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("courses")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setCourses(data || []);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+      toast.error("Failed to load courses");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchCourses();
+  }, []);
   //  Register new user
   const registerNewUser = async (email, password, naturalId, teacher) => {
     try {
@@ -27,7 +49,7 @@ export const AuthContextProvider = ({ children }) => {
       return { success: true, data };
     } catch (error) {
       console.error("There was a problem signing up:", error.message);
-      toast.error(`${ error.message }`);
+      toast.error(`${error.message}`);
       return { success: false, error };
     }
   };
@@ -52,7 +74,7 @@ export const AuthContextProvider = ({ children }) => {
 
       // ✅ Check if user role matches checkbox
       if (role !== expectedRole) {
-        throw new Error(`This account is not a ${ expectedRole }.`);
+        throw new Error(`This account is not a ${expectedRole}.`);
       }
 
       // ✅ Success
@@ -83,7 +105,10 @@ export const AuthContextProvider = ({ children }) => {
   // ✅ NEW: Refresh user data after profile update
   const refreshUserData = async () => {
     try {
-      const { data: { session: newSession }, error } = await supabase.auth.getSession();
+      const {
+        data: { session: newSession },
+        error,
+      } = await supabase.auth.getSession();
       if (error) throw error;
 
       setSession(newSession);
@@ -123,7 +148,7 @@ export const AuthContextProvider = ({ children }) => {
   const {
     email,
     created_at,
-    user_metadata: { naturalId, role, name, phone, avatar_url } = {}
+    user_metadata: { naturalId, role, name, phone, avatar_url } = {},
   } = user;
 
   return (
@@ -147,6 +172,10 @@ export const AuthContextProvider = ({ children }) => {
         avatar_url, // ✅ Add avatar_url
         isOpen,
         setIsOpen,
+        setSearchTerm,
+        searchTerm,
+        courses,
+        setCourses,
       }}>
       {children}
     </AuthContext.Provider>

@@ -25,6 +25,8 @@
   width: 100%;
   display: block;
   border-radius: 12px;
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
 }
 
 .canvas {
@@ -34,6 +36,8 @@
   width: 100%;
   pointer-events: none;
   border-radius: 12px;
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
 }
 
 /* Status Overlay */
@@ -91,8 +95,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.12); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
 }
 
 /* Captured Photo */
@@ -101,6 +110,8 @@
   max-width: 650px;
   border-radius: 16px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
 }
 
 /* Buttons */

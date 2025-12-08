@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../../services/SupabaseClient";
+import { supabase } from "../pages/services/SupabaseClient";
 import { useParams } from "react-router-dom";
-import { UserAuth } from "../../services/AuthContext";
+import { UserAuth } from "../pages/services/AuthContext";
 import toast from "react-hot-toast";
 import "./QuizPage.css";
 

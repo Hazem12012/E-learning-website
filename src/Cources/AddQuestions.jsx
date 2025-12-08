@@ -1,6 +1,6 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { supabase } from "../../services/SupabaseClient";
+import { supabase } from "../pages/services/SupabaseClient";
 
 export default function AddQuestions({
   showQuizModal,
@@ -19,9 +19,7 @@ export default function AddQuestions({
     correctAnswer: 0,
   });
 
-  // -------------------------
-  // ADD QUESTION
-  // -------------------------
+
   const handleAddQuestion = () => {
     if (!currentQuestion.question.trim())
       return toast.error("Enter a question");
@@ -53,9 +51,7 @@ export default function AddQuestions({
     });
   };
 
-  // -------------------------
-  // DELETE QUESTION
-  // -------------------------
+
   const handleDeleteQuestion = (id) => {
     setQuizForm((prev) => ({
       ...prev,
@@ -63,117 +59,7 @@ export default function AddQuestions({
     }));
   };
 
-  // -------------------------
-  // SUBMIT QUIZ
-  // -------------------------
-  // const handleSubmit = async () => {
-  //   if (!quizForm.title.trim()) return toast.error("Quiz title required");
-  //   if (!quizForm.duration.trim()) return toast.error("Duration required");
-  //   if (quizForm.questions.length === 0)
-  //     return toast.error("Add at least one question");
 
-  //   try {
-  //     toast.loading("Saving quiz...", { id: "quiz" });
-
-  //     // 1) Insert Quiz
-  //     const { data: quizData, error: quizError } = await supabase
-  //       .from("quizzes")
-  //       .insert([
-  //         {
-  //           title: quizForm.title,
-  //           description: "Quiz Description",
-  //           course_id: courseId,
-  //           duration: quizForm.duration,
-  //         },
-  //       ])
-  //       .select()
-  //       .single();
-
-  //     if (quizError) throw quizError;
-
-  //     const quizId = quizData.id;
-
-  //     // 2) Insert Questions
-  //     const payload = quizForm.questions.map((q) => ({
-  //       quiz_id: quizId,
-  //       question: q.question,
-  //       options: q.options,
-  //       answer: q.options[q.correctAnswer],
-  //     }));
-
-  //     const { error: qError } = await supabase
-  //       .from("quiz_questions")
-  //       .insert(payload);
-  //     if (qError) throw qError;
-
-  //     toast.success("Quiz created successfully!", { id: "quiz" });
-
-  //     // Reset form
-  //     setQuizForm({ title: "", duration: "", questions: [] });
-  //     setShowQuizModal(false);
-  //   } catch (error) {
-  //     toast.error(error.message, { id: "quiz" });
-  //   }
-  // };
-
-  // const handleSubmit = async () => {
-  //   // Validation
-  //   if (!quizForm.title.trim()) return toast.error("Quiz title required");
-  //   if (!quizForm.duration || Number(quizForm.duration) <= 0)
-  //     return toast.error("Duration required and must be greater than 0");
-  //   if (quizForm.questions.length === 0)
-  //     return toast.error("Add at least one question");
-
-  //   try {
-  //     toast.loading("Saving quiz...", { id: "quiz" });
-
-  //     // 1️⃣ Insert quiz into Supabase
-  //     const { data: quizData, error: quizError } = await supabase
-  //       .from("quizzes")
-  //       .insert([
-  //         {
-  //           title: quizForm.title,
-  //           description: "Quiz Description",
-  //           course_id: courseId,
-  //           duration: Number(quizForm.duration), // تأكد أنها رقم
-  //         },
-  //       ])
-  //       .select()
-  //       .single();
-
-  //     if (quizError) throw quizError;
-
-  //     const quizId = quizData.id;
-
-  //     // 2️⃣ Insert questions
-  //     const payload = quizForm.questions.map((q) => ({
-  //       quiz_id: quizId,
-  //       question: q.question,
-  //       options: q.options,
-  //       answer: q.options[q.correctAnswer],
-  //     }));
-
-  //     const { error: qError } = await supabase
-  //       .from("quiz_questions")
-  //       .insert(payload);
-  //     if (qError) throw qError;
-
-  //     // 3️⃣ Success
-  //     toast.success("Quiz created successfully!", { id: "quiz" });
-
-  //     // 4️⃣ Reset form
-  //     setQuizForm({ title: "", duration: "", questions: [] });
-  //     setCurrentQuestion({
-  //       question: "",
-  //       options: ["", "", "", ""],
-  //       correctAnswer: 0,
-  //     });
-  //     setShowQuizModal(false);
-  //   } catch (error) {
-  //     console.error(error);
-  //     toast.error(error.message || "Error creating quiz", { id: "quiz" });
-  //   }
-  // };
 
   const handleSubmit = async () => {
     if (!quizForm.title.trim()) return toast.error("Quiz title required");

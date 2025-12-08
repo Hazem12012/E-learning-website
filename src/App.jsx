@@ -13,10 +13,10 @@ import PrivateRoute from "./pages/services/PrivateRoute.jsx";
 import Loading from "./components/Loading/Loading.jsx";
 
 // Lazy load all major components
-const Home = React.lazy(() => import("./pages/doctor/Home/Home.jsx"));
-const Profile = React.lazy(() => import("./pages/doctor/Profile/Profile.jsx"));
-const Courses = React.lazy(() => import("./pages/doctor/Cources_2/CoursesPage.jsx"));
-import CourseDetailsPage from './pages/doctor/Cources_2/CourseDetailsPage';
+const Home = React.lazy(() => import("./Home/Home.jsx"));
+const Profile = React.lazy(() => import("./Profile/Profile.jsx"));
+const Courses = React.lazy(() => import("./Cources/CoursesPage.jsx"));
+import CourseDetailsPage from './Cources/CourseDetailsPage.jsx';
 
 function App() {
 

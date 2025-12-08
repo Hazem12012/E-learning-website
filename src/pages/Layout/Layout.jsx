@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Navbar from "../doctor/Navbar/Navbar";
-import Sidebar from "../doctor/Sidebar/Sidebar";
+import Navbar from "../../Navbar/Navbar.jsx";
+import Sidebar from "../../Sidebar/Sidebar.jsx";
 import Loading from "../../components/Loading/Loading.jsx";
 import "./Layout.css";
 import { UserAuth } from "../services/AuthContext.jsx";

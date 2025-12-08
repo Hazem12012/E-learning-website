@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import "./CourseDetailsPage.css";
 import { useParams } from "react-router-dom";
-import { supabase } from "../../services/SupabaseClient";
-import Loading from "./../../../components/Loading/Loading";
+import Loading from "../components/Loading/Loading.jsx";
 import toast from "react-hot-toast";
-import AddQuestions from "./Addquestions";
+import AddQuestions from "./Addquestions.jsx";
 import { TableOfContents } from "lucide-react";
-import QuizPage from "./QuizPage";
-import VideoCam from "../../VideoCam/VideoCam";
+import QuizPage from "./QuizPage.jsx";
 import Lectures from "./Lectures.jsx";
+import { supabase } from "../pages/services/SupabaseClient.js";
+import { UserAuth } from "../pages/services/AuthContext.jsx";
+import VideoCam from './../pages/VideoCam/VideoCam';
 
 export default function CourseDetailsPage() {
   const { courseId } = useParams();
+  const { role } = UserAuth();
   const [loading, setLoading] = useState(false);
   const [course, setCourse] = useState(null);
   const [activeTab, setActiveTab] = useState("desc");
@@ -24,6 +26,22 @@ export default function CourseDetailsPage() {
   const [enrolledStudents, setEnrolledStudents] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
   const [lessons, setLessons] = useState([]);
+  const teacherAccess = [
+    ["desc", "Course Description"],
+    ["lectures", "Lectures"],
+    ["students", "Students"],
+    // ["attendance", "Attendance"],
+    ["quizzes", "Quizzes & Exams"],
+    // ["quiz", "Quiz"],
+  ];
+  const studentAccess = [
+    ["desc", "Course Description"],
+    ["lectures", "Lectures"],
+    ["students", "Students"],
+    ["attendance", "Attendance"],
+    // ["quizzes", "Quizzes & Exams"],
+    ["quiz", "Quiz"],
+  ];
 
   // FIXED: Added all required fields
   const [lessonForm, setLessonForm] = useState({
@@ -387,21 +405,16 @@ export default function CourseDetailsPage() {
 
           {/* Tabs */}
           <div className='tabs'>
-            {[
-              ["desc", "Course Description"],
-              ["lectures", "Lectures"],
-              ["students", "Students"],
-              ["attendance", "Attendance"],
-              ["quizzes", "Quizzes & Exams"],
-              ["quiz", "Quiz"],
-            ].map(([id, label]) => (
-              <button
-                key={id}
-                className={`tab ${activeTab === id ? "active" : ""}`}
-                onClick={() => setActiveTab(id)}>
-                {label}
-              </button>
-            ))}
+            {(role === "teacher" ? teacherAccess : studentAccess).map(
+              ([id, label]) => (
+                <button
+                  key={id}
+                  className={`tab ${activeTab === id ? "active" : ""}`}
+                  onClick={() => setActiveTab(id)}>
+                  {label}
+                </button>
+              )
+            )}
           </div>
 
           {/* Tab Content */}
@@ -436,24 +449,26 @@ export default function CourseDetailsPage() {
               <div className='tab-section' id='students'>
                 <div className='quizzes-header'>
                   <h3>Students</h3>
-                  <button
-                    className='add-quiz-btn'
-                    onClick={() => setShowStudentModal(true)}>
-                    <svg
-                      width='20'
-                      height='20'
-                      viewBox='0 0 24 24'
-                      fill='none'
-                      style={{ marginRight: "8px" }}>
-                      <path
-                        d='M12 5V19M5 12H19'
-                        stroke='currentColor'
-                        strokeWidth='2'
-                        strokeLinecap='round'
-                      />
-                    </svg>
-                    Add Student
-                  </button>
+                  {role === "teacher" && (
+                    <button
+                      className='add-quiz-btn'
+                      onClick={() => setShowStudentModal(true)}>
+                      <svg
+                        width='20'
+                        height='20'
+                        viewBox='0 0 24 24'
+                        fill='none'
+                        style={{ marginRight: "8px" }}>
+                        <path
+                          d='M12 5V19M5 12H19'
+                          stroke='currentColor'
+                          strokeWidth='2'
+                          strokeLinecap='round'
+                        />
+                      </svg>
+                      Add Student
+                    </button>
+                  )}
                 </div>
 
                 {enrolledStudents.length === 0 ? (
@@ -479,27 +494,29 @@ export default function CourseDetailsPage() {
                           <p className='student-id'>{student.studentId}</p>
                           <p className='student-email'>{student.email}</p>
                         </div>
-                        <button
-                          className='student-delete-btn'
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteStudent(student.id, student.name);
-                          }}
-                          title='Remove student'>
-                          <svg
-                            width='16'
-                            height='16'
-                            viewBox='0 0 24 24'
-                            fill='none'
-                            stroke='currentColor'>
-                            <path
-                              d='M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6'
-                              strokeWidth='2'
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                            />
-                          </svg>
-                        </button>
+                        { role === "teacher"&&
+                          <button
+                            className='student-delete-btn'
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteStudent(student.id, student.name);
+                            }}
+                            title='Remove student'>
+                            <svg
+                              width='16'
+                              height='16'
+                              viewBox='0 0 24 24'
+                              fill='none'
+                              stroke='currentColor'>
+                              <path
+                                d='M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6'
+                                strokeWidth='2'
+                                strokeLinecap='round'
+                                strokeLinejoin='round'
+                              />
+                            </svg>
+                          </button>
+                        }
                       </div>
                     ))}
                   </div>

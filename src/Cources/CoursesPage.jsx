@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./CoursesPage.css";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../../services/SupabaseClient";
-import { UserAuth } from "../../services/AuthContext";
 import toast from "react-hot-toast";
-import cover1 from "../../../assets/webdevelopment.jpg"; // Default image
+import cover1 from "../assets/webdevelopment.jpg"; // Default image
+import { supabase } from "../pages/services/SupabaseClient";
+import { UserAuth } from "../pages/services/AuthContext";
 
 const initialCategories = [
   "Web Development",
@@ -15,15 +15,16 @@ const initialCategories = [
 ];
 
 export default function CoursesPage() {
-  const { session } = UserAuth();
+  const { session, role } = UserAuth();
   const [courses, setCourses] = useState([]);
   const [categories, setCategories] = useState(initialCategories);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const { searchTerm, setSearchTerm } = UserAuth();
+  const [code, setCode] = useState("");
 
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     code: "",
     title: "",
@@ -34,6 +35,26 @@ export default function CoursesPage() {
     imageFile: null,
   });
 
+  function generateRandomId(length = 6) {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    let result = "";
+
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    return result;
+  }
+
+  function handelAddNewCourse() {
+    setShowModal(true);
+    const code = generateRandomId(7);
+    form.code = code;
+    setCode(code);
+    console.log(code);
+  }
   // Fetch courses from Supabase
   useEffect(() => {
     fetchCourses();
@@ -95,6 +116,7 @@ export default function CoursesPage() {
       (course.code && course.code.toLowerCase().includes(q));
     return matchesCategory && matchesSearch;
   });
+  console.log(courses);
 
   const uploadCourseImage = async (file) => {
     if (!file) return null;
@@ -290,7 +312,7 @@ export default function CoursesPage() {
             <input
               type='text'
               placeholder='Search for courses, codes or doctors'
-              value={searchTerm}
+              // value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <button className='search-btn' aria-label='Search'>
@@ -328,24 +350,26 @@ export default function CoursesPage() {
           ))}
         </div>
 
-        <div className='add-course-btn-container'>
-          <button className='add-course-btn' onClick={() => setShowModal(true)}>
-            <svg
-              width='20'
-              height='20'
-              viewBox='0 0 24 24'
-              fill='none'
-              style={{ marginRight: "8px" }}>
-              <path
-                d='M12 5V19M5 12H19'
-                stroke='currentColor'
-                strokeWidth='2'
-                strokeLinecap='round'
-              />
-            </svg>
-            Add New Course
-          </button>
-        </div>
+        {role === "teacher" && (
+          <div className='add-course-btn-container'>
+            <button className='add-course-btn' onClick={handelAddNewCourse}>
+              <svg
+                width='20'
+                height='20'
+                viewBox='0 0 24 24'
+                fill='none'
+                style={{ marginRight: "8px" }}>
+                <path
+                  d='M12 5V19M5 12H19'
+                  stroke='currentColor'
+                  strokeWidth='2'
+                  strokeLinecap='round'
+                />
+              </svg>
+              Add New Course
+            </button>
+          </div>
+        )}
 
         <div className='results-header'>
           <h2>{selectedCategory} Courses</h2>
@@ -360,31 +384,33 @@ export default function CoursesPage() {
             <div key={course.id} className='course-card'>
               <div className='course-image'>
                 <img src={course.image} alt={course.title} />
-                <button
-                  className='delete-course-btn'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteCourse(course.id, course.title);
-                  }}
-                  aria-label='Delete course'
-                  title='Delete course'>
-                  <svg width='18' height='18' viewBox='0 0 24 24' fill='none'>
-                    <path
-                      d='M3 6H5H21'
-                      stroke='currentColor'
-                      strokeWidth='2'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                    />
-                    <path
-                      d='M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z'
-                      stroke='currentColor'
-                      strokeWidth='2'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                    />
-                  </svg>
-                </button>
+                {role === "teacher" && (
+                  <button
+                    className='delete-course-btn'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteCourse(course.id, course.title);
+                    }}
+                    aria-label='Delete course'
+                    title='Delete course'>
+                    <svg width='18' height='18' viewBox='0 0 24 24' fill='none'>
+                      <path
+                        d='M3 6H5H21'
+                        stroke='currentColor'
+                        strokeWidth='2'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                      />
+                      <path
+                        d='M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z'
+                        stroke='currentColor'
+                        strokeWidth='2'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                      />
+                    </svg>
+                  </button>
+                )}
               </div>
 
               <div className='course-content'>
@@ -442,6 +468,9 @@ export default function CoursesPage() {
                 <div className='form-group-part'>
                   <label htmlFor='code'>Course Code *</label>
                   <input
+                    disabled
+                    readonly
+                    style={{ cursor: "not-allowed" }}
                     id='code'
                     name='code'
                     value={form.code}
