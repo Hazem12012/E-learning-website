@@ -1,0 +1,179 @@
+/* App Container */
+.appvideo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 450px;
+  padding: 20px;
+}
+
+/* Video Wrapper Card */
+.videoContainer {
+  position: relative;
+  display: inline-block;
+  /* width: 100%; */
+  max-width: 700px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+}
+
+.video {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+}
+
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  border-radius: 12px;
+}
+
+/* Status Overlay */
+.statusOverlay {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Status Badge */
+.statusBadge {
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 16px;
+  color: white;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.45);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.18);
+  transition: 0.3s ease;
+}
+
+.statusSuccess {
+  background: rgba(34, 197, 94, 0.85);
+}
+
+.statusWarning {
+  background: rgba(234, 179, 8, 0.85);
+}
+
+/* Countdown Animation */
+.countdown {
+  text-align: center;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.countdownNumber {
+  font-size: 90px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+.countdownText {
+  margin-top: 8px;
+  font-size: 18px;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+/* Captured Photo */
+.capturedImage {
+  width: 100%;
+  max-width: 650px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Buttons */
+.retakeBtn,
+.reloadBtn {
+  padding: 12px 28px;
+  font-size: 17px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: white;
+  transition: 0.25s ease;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
+}
+
+.retakeBtn {
+  background: #3b82f6;
+}
+.retakeBtn:hover {
+  background: #2563eb;
+  transform: translateY(-3px);
+}
+
+.reloadBtn {
+  background: #ef4444;
+}
+.reloadBtn:hover {
+  background: #dc2626;
+  transform: translateY(-3px);
+}
+
+/* Button container */
+.photoActions {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .videoContainer {
+    padding: 4px;
+  }
+
+  .statusBadge {
+    font-size: 14px;
+    padding: 8px 18px;
+  }
+
+  .countdownNumber {
+    font-size: 60px;
+  }
+
+  .retakeBtn,
+  .reloadBtn {
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statusOverlay {
+    top: 10px;
+  }
+
+  .videoContainer {
+    max-width: 95%;
+  }
+
+  .countdownNumber {
+    font-size: 50px;
+  }
+}

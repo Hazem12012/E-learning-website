@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../../services/SupabaseClient";
 import { UserAuth } from "../../services/AuthContext";
 import toast from "react-hot-toast";
-import cover1 from "./assets/discretemath.jpg"; // Default image
+import cover1 from "../../../assets/webdevelopment.jpg"; // Default image
 
 const initialCategories = [
   "Web Development",

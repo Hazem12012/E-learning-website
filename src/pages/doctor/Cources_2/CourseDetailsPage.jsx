@@ -7,6 +7,8 @@ import toast from "react-hot-toast";
 import AddQuestions from "./Addquestions";
 import { TableOfContents } from "lucide-react";
 import QuizPage from "./QuizPage";
+import VideoCam from "../../VideoCam/VideoCam";
+import Lectures from "./Lectures.jsx";
 
 export default function CourseDetailsPage() {
   const { courseId } = useParams();
@@ -18,34 +20,31 @@ export default function CourseDetailsPage() {
   const [showLessonModal, setShowLessonModal] = useState(false);
   const [showStudentModal, setShowStudentModal] = useState(false);
   const [viewAnswers, setViewAnswers] = useState(false);
-
   const [selectedQuizId, setSelectedQuizId] = useState(null);
-
-  function handleViewAnswers(quizId) {
-    if (selectedQuizId === quizId) {
-      // If clicking the same quiz, toggle off
-      setSelectedQuizId(null);
-      setViewAnswers(false);
-    } else {
-      // If clicking a different quiz, show its questions
-      setSelectedQuizId(quizId);
-      setViewAnswers(true);
-    }
-  }
-
+  const [enrolledStudents, setEnrolledStudents] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
   const [lessons, setLessons] = useState([]);
 
+  // FIXED: Added all required fields
   const [lessonForm, setLessonForm] = useState({
     title: "",
     content: "",
+    video_url: "",
   });
 
   const [studentForm, setStudentForm] = useState({
     naturalId: "",
   });
 
-  const [enrolledStudents, setEnrolledStudents] = useState([]);
+  function handleViewAnswers(quizId) {
+    if (selectedQuizId === quizId) {
+      setSelectedQuizId(null);
+      setViewAnswers(false);
+    } else {
+      setSelectedQuizId(quizId);
+      setViewAnswers(true);
+    }
+  }
 
   // Fetch course data and enrolled students
   useEffect(() => {
@@ -176,7 +175,7 @@ export default function CourseDetailsPage() {
   }, [courseId]);
 
   const toggleLesson = (index) => {
-    if (activeTab !== "curriculum") return;
+    if (activeTab !== "lectures") return;
     setOpenLessons((prev) => ({
       ...prev,
       [index]: !prev[index],
@@ -203,32 +202,42 @@ export default function CourseDetailsPage() {
     }
   };
 
-  const handleLessonSubmit = (e) => {
+  // FIXED: Complete lesson submit handler
+  const handleLessonSubmit = async (e) => {
     e.preventDefault();
 
-    if (!lessonForm.title || !lessonForm.content) {
-      toast.error("Please fill in all lesson fields");
+    if (!lessonForm.title) {
+      toast.error("Please fill in title and content");
       return;
     }
 
-    const newLesson = {
-      id: Date.now(),
-      title: lessonForm.title,
-      content: lessonForm.content,
-    };
+    try {
+      const { data, error } = await supabase
+        .from("lectures")
+        .insert([
+          {
+            course_id: courseId,
+            title: lessonForm.title,
+            video_url: lessonForm.video_url || null,
+            content: lessonForm.content,
+          },
+        ])
+        .select();
 
-    setLessons((prev) => [...prev, newLesson]);
-    setLessonForm({ title: "", content: "" });
-    setShowLessonModal(false);
-    toast.success("Lesson added successfully");
-  };
+      if (error) {
+        console.error(error);
+        toast.error("Error saving lecture: " + error.message);
+        return;
+      }
 
-  const handleDeleteLesson = (lessonId, lessonTitle) => {
-    if (!window.confirm(`Are you sure you want to delete "${lessonTitle}"?`))
-      return;
-
-    setLessons((prev) => prev.filter((l) => l.id !== lessonId));
-    toast.success("Lesson deleted successfully");
+      setLessons((prev) => [...prev, data[0]]);
+      setLessonForm({ title: "", content: "", video_url: "", duration: "" });
+      setShowLessonModal(false);
+      toast.success("Lesson added successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong");
+    }
   };
 
   const handleStudentSubmit = async (e) => {
@@ -380,9 +389,9 @@ export default function CourseDetailsPage() {
           <div className='tabs'>
             {[
               ["desc", "Course Description"],
-              ["curriculum", "Curriculum"],
-              ["instructor", "Instructor"],
+              ["lectures", "Lectures"],
               ["students", "Students"],
+              ["attendance", "Attendance"],
               ["quizzes", "Quizzes & Exams"],
               ["quiz", "Quiz"],
             ].map(([id, label]) => (
@@ -404,138 +413,23 @@ export default function CourseDetailsPage() {
                 <p>{course.description || "No description available"}</p>
               </div>
             )}
-            {/* **************************** */}
-            {/* quiz page Tab */}
+
+            {/* Quiz Page Tab */}
             {activeTab === "quiz" && <QuizPage />}
 
-            {/* Curriculum Tab */}
-            {activeTab === "curriculum" && (
-              <div className='tab-section'>
-                <div className='quizzes-header'>
-                  <h3>Course Modules</h3>
-                  <button
-                    className='add-quiz-btn'
-                    onClick={() => setShowLessonModal(true)}>
-                    <svg
-                      width='20'
-                      height='20'
-                      viewBox='0 0 24 24'
-                      fill='none'
-                      style={{ marginRight: "8px" }}>
-                      <path
-                        d='M12 5V19M5 12H19'
-                        stroke='currentColor'
-                        strokeWidth='2'
-                        strokeLinecap='round'
-                      />
-                    </svg>
-                    Add Lesson
-                  </button>
-                </div>
-
-                {lessons.length === 0 ? (
-                  <div className='no-students'>
-                    <i className='fas fa-book'></i>
-                    <p>
-                      No lessons added yet. Click "Add Lesson" to create your
-                      first lesson.
-                    </p>
-                  </div>
-                ) : (
-                  lessons.map((lesson, index) => (
-                    <div
-                      key={lesson.id}
-                      className={`lesson ${openLessons[index] ? "open" : ""}`}>
-                      <div
-                        className='lesson-header'
-                        onClick={() => toggleLesson(index)}>
-                        <span className='lesson-title'>
-                          <i className='fas fa-book'></i> {lesson.title}
-                        </span>
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "10px",
-                            alignItems: "center",
-                          }}>
-                          <button
-                            className='quiz-delete-btn'
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteLesson(lesson.id, lesson.title);
-                            }}
-                            style={{
-                              padding: "6px 10px",
-                              marginRight: "10px",
-                            }}>
-                            <svg
-                              width='16'
-                              height='16'
-                              viewBox='0 0 24 24'
-                              fill='none'
-                              stroke='currentColor'>
-                              <path
-                                d='M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6'
-                                strokeWidth='2'
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                              />
-                            </svg>
-                          </button>
-                          <span className='arrow'>▼</span>
-                        </div>
-                      </div>
-
-                      {openLessons[index] && (
-                        <div className='lesson-content'>
-                          <p>{lesson.content}</p>
-                        </div>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
+            {/* Lectures Tab */}
+            {activeTab === "lectures" && (
+              <Lectures
+                openLessons={openLessons}
+                lessons={lessons}
+                setLessons={setLessons}
+                setShowLessonModal={setShowLessonModal}
+                toggleLesson={toggleLesson}
+              />
             )}
 
-            {/* Instructor Tab */}
-            {activeTab === "instructor" && (
-              <div className='tab-section' id='instructor'>
-                <h3>About the Instructor</h3>
-                <div className='inst'>
-                  <div className='inst-info'>
-                    <h4>{course.instructor}</h4>
-                    <p className='inst-title'>Professor</p>
-                    <p className='inst-department'>
-                      Department of {course.category}, Faculty of Science
-                    </p>
-                    <p className='inst-bio'>
-                      {course.instructor} has extensive teaching experience and
-                      expertise in {course.category}. They are dedicated to
-                      helping students achieve their academic goals and develop
-                      strong foundational knowledge in the subject area.
-                    </p>
-                    <div className='inst-contact'>
-                      <p>
-                        <i className='fas fa-envelope'></i>{" "}
-                        {course.instructor
-                          .toLowerCase()
-                          .replace(/\s+/g, ".")
-                          .replace("dr.", "")}
-                        @university.edu
-                      </p>
-                      <p>
-                        <i className='fas fa-building'></i> Office: Building B,
-                        Room 304
-                      </p>
-                      <p>
-                        <i className='fas fa-clock'></i> Office Hours: Sun &
-                        Tue, 2-4 PM
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Attendance Tab */}
+            {activeTab === "attendance" && <VideoCam />}
 
             {/* Students Tab */}
             {activeTab === "students" && (
@@ -695,10 +589,9 @@ export default function CourseDetailsPage() {
                             </div>
                           </div>
 
-                          {/* Questions Section - Conditionally rendered */}
+                          {/* Questions Section */}
                           {viewAnswers &&
                             selectedQuizId === quiz.id &&
-                            quiz.quiz_questions &&
                             quiz.quiz_questions &&
                             quiz.quiz_questions.length > 0 && (
                               <div className='quiz-questions-section'>
@@ -800,22 +693,29 @@ export default function CourseDetailsPage() {
             </div>
 
             <form onSubmit={handleLessonSubmit} className='modal-form'>
+              {/* Title */}
               <div className='form-group-part'>
-                <label htmlFor='lesson-title'>Lesson Title *</label>
+                <label htmlFor='lesson-title'>
+                  Lesson Title <span style={{ color: "red" }}>*</span>
+                </label>
                 <input
                   id='lesson-title'
                   name='title'
+                  type='text'
                   value={lessonForm.title}
                   onChange={(e) =>
                     setLessonForm({ ...lessonForm, title: e.target.value })
                   }
-                  placeholder='e.g. Week 1: Introduction'
+                  placeholder='e.g. Week 1: Introduction to React'
                   required
                 />
               </div>
 
+              {/* Content */}
               <div className='form-group-part'>
-                <label htmlFor='lesson-content'>Lesson Content *</label>
+                <label htmlFor='lesson-content'>
+                  Lesson Description <span style={{ color: "red" }}>*</span>
+                </label>
                 <textarea
                   id='lesson-content'
                   name='content'
@@ -823,21 +723,48 @@ export default function CourseDetailsPage() {
                   onChange={(e) =>
                     setLessonForm({ ...lessonForm, content: e.target.value })
                   }
-                  placeholder='Describe the lesson content, topics, assignments, etc.'
-                  rows={6}
+                  placeholder='Describe the lesson content, topics covered, learning objectives...'
+                  rows={5}
                   required
+                  style={{
+                    resize: "vertical",
+                    fontFamily: "inherit",
+                  }}
                 />
               </div>
 
+              {/* Video URL */}
+              <div className='form-group-part'>
+                <label htmlFor='lesson-video'>Video URL</label>
+                <input
+                  id='lesson-video'
+                  name='video_url'
+                  type='url'
+                  value={lessonForm.video_url}
+                  onChange={(e) =>
+                    setLessonForm({ ...lessonForm, video_url: e.target.value })
+                  }
+                  placeholder='https://youtube.com/watch?v=...'
+                />
+              </div>
+
+              {/* Actions */}
               <div className='modal-actions'>
                 <button
                   type='button'
                   className='btn-cancel'
-                  onClick={() => setShowLessonModal(false)}>
+                  onClick={() => {
+                    setShowLessonModal(false);
+                    setLessonForm({
+                      title: "",
+                      content: "",
+                      video_url: "",
+                    });
+                  }}>
                   Cancel
                 </button>
                 <button type='submit' className='btn-submit'>
-                  Add Lesson
+                  ✓ Add Lesson
                 </button>
               </div>
             </form>
