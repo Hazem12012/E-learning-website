@@ -69,10 +69,13 @@ export default function VideoCam({ sendData, detectCheck }) {
       formData.append("course_id", courseId || "86875");
 
       // Call your face recognition API
-      const response = await fetch("http://localhost:8000/attend", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "https://4df3060f29a4.ngrok-free.app/attend",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const result = await response.json();
       // console.log("Face Recognition Result:", result);

@@ -76,7 +76,7 @@ export default function RegisterCam({ sendData, detectCheck }) {
       formData.append("course_id", courseId || "324324324");
 
       // Call your face registration/verification API
-      const response = await fetch("http://localhost:8000/verify", {
+      const response = await fetch("https://4df3060f29a4.ngrok-free.app/verify", {
         method: "POST",
         body: formData,
       });
@@ -86,8 +86,7 @@ export default function RegisterCam({ sendData, detectCheck }) {
 
       // If face is verified/registered successfully
       if (result.status === "verified" || result.status === "registered") {
-        // Create initial attendance record in Supabase
-        // This serves as registration for the attendance system
+
         const { data: attendanceData, error: attendanceError } = await supabase
           .from("attendance")
           .insert({
