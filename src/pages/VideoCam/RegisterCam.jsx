@@ -4,15 +4,16 @@ import styles from "./VideoCam.module.css";
 import videoCover from "../../assets/Webcam cover.webp";
 import toast from "react-hot-toast";
 import { UserAuth } from "../services/AuthContext";
+import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "../services/SupabaseClient";
-import { useParams } from "react-router-dom";
 
-export default function VideoCam({ sendData, detectCheck }) {
+export default function RegisterCam({ sendData, detectCheck }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const detectIntervalRef = useRef(null);
   const photoTakenRef = useRef(false);
   const { naturalId } = UserAuth();
+  const navigate = useNavigate();
   const { courseId } = useParams(); // Get courseId from URL params
 
   const [message, setMessage] = useState(null);
@@ -24,21 +25,7 @@ export default function VideoCam({ sendData, detectCheck }) {
   const [cameraStarted, setCameraStarted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-
-  // Stop video
-  const stopVideo = useCallback(() => {
-    if (detectIntervalRef.current) {
-      clearInterval(detectIntervalRef.current);
-      detectIntervalRef.current = null;
-    }
-
-    if (videoRef.current && videoRef.current.srcObject) {
-      const tracks = videoRef.current.srcObject.getTracks();
-      tracks.forEach((track) => track.stop());
-      videoRef.current.srcObject = null;
-    }
-  }, []);
-  const handleSubmitAttendance = async () => {
+  const handleSubmitRegistration = async () => {
     if (isSubmitting) return; // Prevent double submission
 
     setIsSubmitting(true);
@@ -61,31 +48,52 @@ export default function VideoCam({ sendData, detectCheck }) {
         return;
       }
 
+      // Check if user is already registered in this course
+      const { data: existingRegistration } = await supabase
+        .from("attendance")
+        .select("id")
+        .eq("student_id", user.id)
+        .eq("course_id", courseId)
+        .limit(1);
+
+      if (existingRegistration && existingRegistration.length > 0) {
+        toast.error(
+          "You are already registered for attendance in this course!"
+        );
+        setIsSubmitting(false);
+
+        setTimeout(() => {
+          navigate(-1);
+        }, 2000);
+        return;
+      }
+
       // Convert Base64 to Blob for face recognition API
       const blob = await (await fetch(image)).blob();
       const formData = new FormData();
       formData.append("image", blob, "face.jpg");
       formData.append("national_id", naturalId);
-      formData.append("course_id", courseId || "86875");
+      formData.append("course_id", courseId || "324324324");
 
-      // Call your face recognition API
-      const response = await fetch("http://localhost:8000/attend", {
+      // Call your face registration/verification API
+      const response = await fetch("http://localhost:8000/verify", {
         method: "POST",
         body: formData,
       });
 
       const result = await response.json();
-      // console.log("Face Recognition Result:", result);
+      console.log("Face Registration Result:", result);
 
-      // If face is verified, save to Supabase
+      // If face is verified/registered successfully
       if (result.status === "verified" || result.status === "registered") {
-        // Save attendance to Supabase
+        // Create initial attendance record in Supabase
+        // This serves as registration for the attendance system
         const { data: attendanceData, error: attendanceError } = await supabase
           .from("attendance")
           .insert({
             student_id: user.id,
             course_id: courseId,
-            attended: true,
+            attended: false,
             date: new Date().toISOString(),
           })
           .select();
@@ -95,30 +103,25 @@ export default function VideoCam({ sendData, detectCheck }) {
 
           // Check if error is duplicate entry
           if (attendanceError.code === "23505") {
-            toast.error(result);
-            console.log(result)
+            toast.error("You are already registered for this course!");
           } else {
-            toast.error(
-              "Failed to save attendance: " + attendanceError.message
-            );
+            toast.error("Failed to register: " + attendanceError.message);
           }
           setIsSubmitting(false);
           return;
         }
 
-        // console.log("Attendance saved to Supabase:", attendanceData);
-        toast.success("Attendance recorded successfully!");
+        console.log("Registration saved to Supabase:", attendanceData);
+        toast.success("Face registered successfully! ✓");
 
-        // Optional: Reset the component after successful submission
+        // Navigate back to courses after successful registration
         setTimeout(() => {
-          photoTakenRef.current = false;
-          setImage(null);
-          setCameraStarted(false);
+          navigate(-1);
         }, 2000);
       } else {
-        toast.error(result.message || "Face verification failed");
+        toast.error(result.message || "Face registration failed");
 
-        // Optional: Allow retake on failure
+        // Allow retake on failure
         // photoTakenRef.current = false;
         // setImage(null);
         // startVideo().then(() => {
@@ -128,8 +131,8 @@ export default function VideoCam({ sendData, detectCheck }) {
         // });
       }
     } catch (err) {
-      console.error("Attendance Error:", err);
-      toast.error("Failed to record attendance. Please try again.");
+      console.error("Registration Error:", err);
+      toast.error("Failed to register face. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -295,7 +298,19 @@ export default function VideoCam({ sendData, detectCheck }) {
     stopVideo();
   }, [sendData]);
 
+  // Stop video
+  const stopVideo = useCallback(() => {
+    if (detectIntervalRef.current) {
+      clearInterval(detectIntervalRef.current);
+      detectIntervalRef.current = null;
+    }
 
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = videoRef.current.srcObject.getTracks();
+      tracks.forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
+    }
+  }, []);
 
   // Initialize
   useEffect(() => {
@@ -443,7 +458,7 @@ export default function VideoCam({ sendData, detectCheck }) {
             className={styles.video}
             autoPlay
             muted
-            playsInline
+            playsInPlace
             style={{
               width: "100%",
               maxWidth: "640px",
@@ -466,8 +481,9 @@ export default function VideoCam({ sendData, detectCheck }) {
           <div className={styles.statusOverlay}>
             {detectionQuality && (
               <div
-                className={`${styles.statusBadge} ${faceDetected ? styles.statusSuccess : styles.statusWarning
-                  }`}>
+                className={`${styles.statusBadge} ${
+                  faceDetected ? styles.statusSuccess : styles.statusWarning
+                }`}>
                 {detectionQuality}
               </div>
             )}
@@ -514,7 +530,7 @@ export default function VideoCam({ sendData, detectCheck }) {
             </button>
 
             <button
-              onClick={handleSubmitAttendance}
+              onClick={handleSubmitRegistration}
               disabled={isSubmitting}
               style={{
                 padding: "12px 30px",
@@ -527,7 +543,7 @@ export default function VideoCam({ sendData, detectCheck }) {
                 cursor: isSubmitting ? "not-allowed" : "pointer",
                 opacity: isSubmitting ? 0.6 : 1,
               }}>
-              {isSubmitting ? "Submitting..." : "Submit Attendance"}
+              {isSubmitting ? "Registering..." : "Register Face"}
             </button>
           </div>
         </div>

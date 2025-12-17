@@ -17,7 +17,6 @@ function Lectures({
   const { role } = UserAuth();
 
   const fetchLectures = async () => {
-    // console.log("Fetching lectures for courseId:", courseId);
 
     if (!courseId) {
       console.warn("⛔ No courseId provided!");

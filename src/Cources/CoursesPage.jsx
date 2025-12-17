@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./CoursesPage.css";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import cover1 from "../assets/webdevelopment.jpg"; // Default image
+import cover1 from "../assets/webdevelopment.jpg"; 
 import { supabase } from "../pages/services/SupabaseClient";
 import { UserAuth } from "../pages/services/AuthContext";
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./CourseDetailsPage.css";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../components/Loading/Loading.jsx";
 import toast from "react-hot-toast";
 import AddQuestions from "./Addquestions.jsx";
@@ -9,7 +9,7 @@ import QuizPage from "./QuizPage.jsx";
 import Lectures from "./Lectures.jsx";
 import { supabase } from "../pages/services/SupabaseClient.js";
 import { UserAuth } from "../pages/services/AuthContext.jsx";
-import VideoCam from './../pages/VideoCam/VideoCam';
+import VideoCam from "./../pages/VideoCam/VideoCam";
 
 export default function CourseDetailsPage() {
   const { courseId } = useParams();
@@ -26,24 +26,24 @@ export default function CourseDetailsPage() {
   const [enrolledStudents, setEnrolledStudents] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
   const [lessons, setLessons] = useState([]);
+  const [isCheckingAttendance, setIsCheckingAttendance] = useState(false);
+  const navigate = useNavigate();
+
   const teacherAccess = [
     ["desc", "Course Description"],
     ["lectures", "Lectures"],
     ["students", "Students"],
-    // ["attendance", "Attendance"],
     ["quizzes", "Quizzes & Exams"],
-    // ["quiz", "Quiz"],
   ];
+
   const studentAccess = [
     ["desc", "Course Description"],
     ["lectures", "Lectures"],
     ["students", "Students"],
     ["attendance", "Attendance"],
-    // ["quizzes", "Quizzes & Exams"],
     ["quiz", "Quiz"],
   ];
 
-  // FIXED: Added all required fields
   const [lessonForm, setLessonForm] = useState({
     title: "",
     content: "",
@@ -53,6 +53,169 @@ export default function CourseDetailsPage() {
   const [studentForm, setStudentForm] = useState({
     naturalId: "",
   });
+
+  // const checkAttendanceRegistration = async () => {
+  //   setIsCheckingAttendance(true);
+
+  //   try {
+  //     // 1️⃣ جلب المستخدم الحالي
+  //     const {
+  //       data: { user },
+  //       error: userError,
+  //     } = await supabase.auth.getUser();
+
+  //     if (userError || !user) {
+  //       toast.error("Please login to access attendance");
+  //       setIsCheckingAttendance(false);
+  //       return false;
+  //     }
+
+  //     // 2️⃣ التحقق هل user مسجل في attendance
+  //     const { data: attendanceRecords, error } = await supabase
+  //       .from("attendance")
+  //       .select("id")
+  //       .eq("student_id", user.id)
+  //       .eq("course_id", courseId)
+  //       .maybeSingle();
+  //     // 👈 مهم
+
+  //     if (error) {
+  //       console.error("Attendance check error:", error);
+  //       toast.error("Error checking attendance registration");
+  //       setIsCheckingAttendance(false);
+  //       return false;
+  //     }
+
+  //     // 3️⃣ لو السجل موجود → مسموح بالحضور
+  //     if (attendanceRecords) {
+  //       setIsCheckingAttendance(false);
+  //       return true; // ✅ ENABLE ATTENDANCE
+  //     }
+  //     console.log(attendanceRecords);
+  //     // 4️⃣ لو مش موجود → غير مسجل
+  //     toast(
+  //       (t) => (
+  //         <span>
+  //           You are not registered in the attendance system.
+  //           <button
+  //             onClick={() => {
+  //               navigate("/register_cam");
+  //               toast.dismiss(t.id);
+  //             }}
+  //             style={{
+  //               marginLeft: "10px",
+  //               background: "#49bbbd",
+  //               color: "#fff",
+  //               border: "none",
+  //               padding: "5px 10px",
+  //               borderRadius: "4px",
+  //               cursor: "pointer",
+  //             }}>
+  //             Register Now
+  //           </button>
+  //         </span>
+  //       ),
+  //       {
+  //         duration: 6000,
+  //         icon: "⚠️",
+  //       }
+  //     );
+
+  //     setIsCheckingAttendance(false);
+  //     return false;
+  //   } catch (err) {
+  //     console.error("Unexpected error:", err);
+  //     toast.error("An error occurred while checking attendance registration");
+  //     setIsCheckingAttendance(false);
+  //     return false;
+  //   }
+  // };
+
+  // Handle tab changes with attendance check
+  const checkAttendanceRegistration = async () => {
+    setIsCheckingAttendance(true);
+
+    try {
+      // 1️⃣ get current user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        toast.error("Please login to access attendance");
+        setIsCheckingAttendance(false);
+        return false;
+      }
+
+      // 2️⃣ check if student_id exists (NO single / maybeSingle)
+      const { data, error } = await supabase
+        .from("attendance")
+        .select("id")
+        .eq("student_id", user.id)
+        .limit(1); // 👈 VERY IMPORTANT
+
+      if (error) {
+        console.error("Attendance check error:", error);
+        toast.error("Error checking attendance registration");
+        setIsCheckingAttendance(false);
+        return false;
+      }
+
+      // 3️⃣ if record exists → allow attendance
+      if (data && data.length > 0) {
+        setIsCheckingAttendance(false);
+        return true; // ✅ ENABLE ATTENDANCE
+      }
+
+      // 4️⃣ not registered
+      toast(
+        (t) => (
+          <span>
+            You are not registered in the attendance system.
+            <button
+              onClick={() => {
+                navigate("/register_cam");
+                toast.dismiss(t.id);
+              }}
+              style={{
+                marginLeft: "10px",
+                background: "#49bbbd",
+                color: "#fff",
+                border: "none",
+                padding: "5px 10px",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}>
+              Register Now
+            </button>
+          </span>
+        ),
+        { duration: 6000, icon: "⚠️" }
+      );
+
+      setIsCheckingAttendance(false);
+      return false;
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      toast.error("An error occurred while checking attendance registration");
+      setIsCheckingAttendance(false);
+      return false;
+    }
+  };
+
+  const handleTabChange = async (tabId) => {
+    // If trying to access attendance tab and user is a student
+    if (tabId === "attendance" && role === "student") {
+      const isRegistered = await checkAttendanceRegistration();
+
+      if (!isRegistered) {
+        return; // Don't change tab if not registered
+      }
+    }
+
+    setActiveTab(tabId);
+  };
 
   function handleViewAnswers(quizId) {
     if (selectedQuizId === quizId) {
@@ -220,7 +383,6 @@ export default function CourseDetailsPage() {
     }
   };
 
-  // FIXED: Complete lesson submit handler
   const handleLessonSubmit = async (e) => {
     e.preventDefault();
 
@@ -409,9 +571,20 @@ export default function CourseDetailsPage() {
               ([id, label]) => (
                 <button
                   key={id}
-                  className={`tab ${activeTab === id ? "active" : ""}`}
-                  onClick={() => setActiveTab(id)}>
-                  {label}
+                  className={`tab ${activeTab === id ? "active" : ""} ${
+                    isCheckingAttendance && id === "attendance"
+                      ? "checking"
+                      : ""
+                  }`}
+                  onClick={() => handleTabChange(id)}
+                  disabled={isCheckingAttendance && id === "attendance"}>
+                  {isCheckingAttendance && id === "attendance" ? (
+                    <>
+                      <span className='spinner'></span> Checking...
+                    </>
+                  ) : (
+                    label
+                  )}
                 </button>
               )
             )}
@@ -494,7 +667,7 @@ export default function CourseDetailsPage() {
                           <p className='student-id'>{student.studentId}</p>
                           <p className='student-email'>{student.email}</p>
                         </div>
-                        { role === "teacher"&&
+                        {role === "teacher" && (
                           <button
                             className='student-delete-btn'
                             onClick={(e) => {
@@ -516,7 +689,7 @@ export default function CourseDetailsPage() {
                               />
                             </svg>
                           </button>
-                        }
+                        )}
                       </div>
                     ))}
                   </div>

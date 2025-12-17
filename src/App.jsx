@@ -16,10 +16,10 @@ import Loading from "./components/Loading/Loading.jsx";
 const Home = React.lazy(() => import("./Home/Home.jsx"));
 const Profile = React.lazy(() => import("./Profile/Profile.jsx"));
 const Courses = React.lazy(() => import("./Cources/CoursesPage.jsx"));
-import CourseDetailsPage from './Cources/CourseDetailsPage.jsx';
+import CourseDetailsPage from "./Cources/CourseDetailsPage.jsx";
+import RegisterCam from "./pages/VideoCam/RegisterCam.jsx";
 
 function App() {
-
   const router = createBrowserRouter([
     {
       element: <Layout />,
@@ -74,6 +74,16 @@ function App() {
             </PrivateRoute>
           ),
         },
+        {
+          path: "/register_cam",
+          element: (
+            <PrivateRoute>
+              <Suspense fallback={<Loading />}>
+                <RegisterCam />
+              </Suspense>
+            </PrivateRoute>
+          ),
+        },
       ],
     },
     {
@@ -103,7 +113,7 @@ function App() {
     <AuthContextProvider>
       <RouterProvider router={router} />
       <Toaster
-        position="top-center"
+        position='top-center'
         containerStyle={{
           top: 80,
         }}

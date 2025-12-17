@@ -43,7 +43,6 @@ export default function AddQuestions({
       ],
     }));
 
-    // Reset current question
     setCurrentQuestion({
       question: "",
       options: ["", "", "", ""],
@@ -118,9 +117,7 @@ export default function AddQuestions({
     }
   };
 
-  // -------------------------
-  // OPTION CHANGE
-  // -------------------------
+
   const handleOptionChange = (index, value) => {
     setCurrentQuestion((prev) => {
       const newOptions = [...prev.options];
