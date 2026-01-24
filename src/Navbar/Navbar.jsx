@@ -60,10 +60,10 @@ function Navbar() {
           <div className='profile px-4 '>
             <button className='border-0' onClick={() => setIsOpen(!isOpen)}>
               <img
-                className=' rounded-circle '
+                className='rounded-circle image_box'
                 src={avatar_url || demo_avatar}
                 alt='Logo'
-                width={"40px"}
+                // width={"40px"}
               />
             </button>
           </div>
