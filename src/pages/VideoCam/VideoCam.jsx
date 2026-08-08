@@ -68,13 +68,13 @@ export default function VideoCam({ sendData, detectCheck }) {
       formData.append("national_id", naturalId);
       formData.append("course_id", courseId || "86875");
 
-      // Call your face recognition API
+      // Call your face recognition <API></API>
       const response = await fetch(
-        "https://4df3060f29a4.ngrok-free.app/attend",
+        "https://c378dd520b63.ngrok-free.app/attend",
         {
           method: "POST",
           body: formData,
-        }
+        },
       );
 
       const result = await response.json();

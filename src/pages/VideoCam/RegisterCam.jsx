@@ -58,7 +58,7 @@ export default function RegisterCam({ sendData, detectCheck }) {
 
       if (existingRegistration && existingRegistration.length > 0) {
         toast.error(
-          "You are already registered for attendance in this course!"
+          "You are already registered for attendance in this course!",
         );
         setIsSubmitting(false);
 
@@ -76,17 +76,19 @@ export default function RegisterCam({ sendData, detectCheck }) {
       formData.append("course_id", courseId || "324324324");
 
       // Call your face registration/verification API
-      const response = await fetch("https://4df3060f29a4.ngrok-free.app/verify", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "https://c378dd520b63.ngrok-free.app/verify",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
       const result = await response.json();
-      console.log("Face Registration Result:", result);
+      console.log("Face Registration Result:", result); //*************************************** */
 
       // If face is verified/registered successfully
       if (result.status === "verified" || result.status === "registered") {
-
         const { data: attendanceData, error: attendanceError } = await supabase
           .from("attendance")
           .insert({
@@ -118,7 +120,7 @@ export default function RegisterCam({ sendData, detectCheck }) {
           navigate(-1);
         }, 2000);
       } else {
-        toast.error(result.message || "Face registration failed");
+        toast.error(result.detail);
 
         // Allow retake on failure
         // photoTakenRef.current = false;
@@ -219,7 +221,7 @@ export default function RegisterCam({ sendData, detectCheck }) {
             new faceapi.TinyFaceDetectorOptions({
               inputSize: 224,
               scoreThreshold: 0.5,
-            })
+            }),
           )
           .withFaceLandmarks()
           .withFaceExpressions();
@@ -529,7 +531,7 @@ export default function RegisterCam({ sendData, detectCheck }) {
             </button>
 
             <button
-            className=""
+              className=''
               onClick={handleSubmitRegistration}
               disabled={isSubmitting}
               style={{
